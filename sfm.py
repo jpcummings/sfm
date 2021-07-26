@@ -32,31 +32,32 @@ import copy
 
 
 class Cohort:
-	def __init__(self, name, type, nstud, startsem, currsem, tuition, room,board, sfees, aid, f_res,ret):
+	def __init__(self, name, type, nstud, startsem, currsem, tuition, room, board, fees, aid, fracresidential,retention):
 		self._name = name
 		self._type = type	# ug, grad, MSA, MBA (currently)
-		self._numStudents = int(nstud)
-		self._startSemester = int(startsem)
-		self._currentSemester = int(currsem)
-		self._tuition = tuition
+		self._numstudents = int(nstud)
+		self._firstsemester = int(startsem)
+		self._currentsemester = int(currsem)
+#		self._tuition = tuition
 		self._room = room
 		self._board = board
-		self._sfees = sfees
+		self._fees = fees
 		self._aid = aid
-		self._f_res = f_res 
-		self._retention = ret
+		self._fracresidential = fracresidential 
+		self._retention = retention
+
 		self._tuition = getTuition(self.year(), self.type())
 
 #	def __repr__(self):
-#		print("%s, %d, %d, %d, %6.2f, %6.2f, %6.2f, %6.2f %6.2f" % (self._name,self._numStudents,self._startSemester,self._currentSemester,self._tuition,self._room, self._board, self._sfees, self._aid, self._f_res))
+#		print("%s, %d, %d, %d, %6.2f, %6.2f, %6.2f, %6.2f %6.2f" % (self._name,self._numstudents,self._firstsemester,self._currentsemester,self._tuition,self._room, self._board, self._fees, self._aid, self._fracresidential))
 #		s = ""
 #		return s
 
-	def print_c(self):
-		print("%d %s, %s, %d, %d, %d, %6.2f, %6.2f, %6.2f, %6.2f %6.2f %6.2f" % (self.isemester(), self._name,self._type,self._numStudents,self._startSemester,self._currentSemester,self._tuition,self._room,self._board, self._sfees, self._aid, self._f_res))
+	def printcohort(self):
+		print("%d %s, %s, %d, %d, %d, %6.2f, %6.2f, %6.2f, %6.2f %6.2f %6.2f" % (self.isemester(), self._name,self._type,self._numstudents,self._firstsemester,self._currentsemester,self._tuition,self._room,self._board, self._fees, self._aid, self._fracresidential))
 		# print('isemester: '+str(c.isemester()))
 
-	def get_prefix(self):
+	def getprefix(self):
 		# assumes for of name if prefix_semester
 		return self._name.partition('_')[0]
 
@@ -70,73 +71,73 @@ class Cohort:
 			return False
 
 	def nstud(self):
-		return self._numStudents
+		return self._numstudents
 
-	def numberResidential(self):
-		return self._f_res*self._numStudents
+	def numberresidential(self):
+		return self._fracresidential*self._numstudents
 
 	def tuition(self):
-		return self._numStudents*(self._tuition)
+		return self._numstudents*(self._tuition)
 
 	def fees(self):
-		return self._numStudents*(self._sfees)
+		return self._numstudents*(self._fees)
 
-	def financial_aid(self):
-		return self._numStudents*self._aid
+	def financialaid(self):
+		return self._numstudents*self._aid
 
 	def revenue(self):
 		return self.tuition()+self.fees()+self.room()+self.board()
 
 	def room(self):
-		room = self._numStudents*(self._room)*self._f_res
+		room = self._numstudents*(self._room)*self._fracresidential
 		return room
 
 	def board(self):
-		board = self._numStudents*(self._board)*self._f_res
+		board = self._numstudents*(self._board)*self._fracresidential
 		return board
 
 	def isemester(self):
-		syear = self._startSemester/100
-		ssem = self._startSemester%100
-		cyear = self._currentSemester/100
-		csem = self._currentSemester%100
-		return (csem-ssem)/10 + 2*(cyear-syear)
+		fyear = self._firstsemester/100
+		fsem = self._firstsemester%100
+		cyear = self._currentsemester/100
+		csem = self._currentsemester%100
+		return (csem-fsem)/10 + 2*(cyear-fyear)
 
 	def iyear(self):
-		syear = self._startSemester/100
-		cyear = self._currentSemester/100
-		return (cyear-syear)
+		fyear = self._firstsemester/100
+		cyear = self._currentsemester/100
+		return (cyear-fyear)
 
 	def year(self):
-		return self._currentSemester/100
+		return self._currentsemester/100
 
 	# bump this group of students by a semester
 	def age(self):
-		cyear = self._currentSemester/100
-		csem = self._currentSemester%100
+		cyear = self._currentsemester/100
+		csem = self._currentsemester%100
 		if csem == 30:
 			#add 10 to semester
 			csem += 10
 #			print(cyear*100+csem)
-			self._currentSemester = cyear*100+csem
+			self._currentsemester = cyear*100+csem
 		elif csem == 40:
 			#add 1 to year and set csem to 30
 			cyear += 1
 			csem = 30
 #			print(cyear*100+csem)
-			self._currentSemester = cyear*100+csem
+			self._currentsemester = cyear*100+csem
 		else:
 			print('bad semester in .age()')
 
 		#update values
 		
 		self._tuition = getTuition(cyear,self._type)
-		self._numStudents = self._retention[self.isemester()-1]*self._numStudents  # QQ: need to add in transfers
+		self._numstudents = self._retention[self.isemester()-1]*self._numstudents  # QQ: need to add in transfers
 		self._room = 1.0275*self._room # QQ: how to model r&b increases?
 		self._board = 1.0275*self._board # QQ: how to model r&b increases?
-		# self._sfees = sfees # QQ: how to model fee increases?
+		# self._fees = fees # QQ: how to model fee increases?
 		# self._aid = aid # QQ: is aid truly flat?
-		# self._f_res = f_res  # QQ: does fraction of residents change?
+		# self._fracresidential = fracresidential  # QQ: does fraction of residents change?
 		
 		return self
 
@@ -191,22 +192,22 @@ def getTuition(year, type):
 		tuition = MSATuition
 	return tuition[year]
 
-def read_cohorts(d, semester):
+def readcohorts(d, semester):
 	cc = []		
 	for i, r in d.iterrows():
 		if (d['stype'][i] != 'comment') and (d['semester'][i] == semester) :
-			ret =[d['r2'][i],d['r3'][i],d['r4'][i],d['r5'][i],d['r6'][i],d['r7'][i],d['r8'][i],d['r9'][i],d['r10'][i],d['r11'][i],d['r12'][i]]
-			cc.append(Cohort(d['name'][i], d['type'][i], d['nstud'][i], d['startsem'][i], d['semester'][i], d['tuition'][i], d['room'][i], d['board'][i], d['fees'][i], d['aid'][i], d['f_res'][i], ret ))
+			retention =[d['r2'][i],d['r3'][i],d['r4'][i],d['r5'][i],d['r6'][i],d['r7'][i],d['r8'][i],d['r9'][i],d['r10'][i],d['r11'][i],d['r12'][i]]
+			cc.append(Cohort(d['name'][i], d['type'][i], d['nstud'][i], d['startsem'][i], d['semester'][i], d['tuition'][i], d['room'][i], d['board'][i], d['fees'][i], d['aid'][i], d['fracresidential'][i], retention ))
 	return cc
 
 
-def add_cohorts(cc,d,semester):
+def addcohorts(cc,d,semester):
 	# we should add a test here to make sure we are starting in the fall
 	# loop over data frame and find cohorts starting in *semester*
 	for i, r in d.iterrows():
 		if d['startsem'][i] == semester :
-			ret =[d['r2'][i],d['r3'][i],d['r4'][i],d['r5'][i],d['r6'][i],d['r7'][i],d['r8'][i],d['r9'][i],d['r10'][i],d['r11'][i],d['r12'][i]]
-			cc.append(Cohort(d['name'][i], d['type'][i], d['nstud'][i], d['startsem'][i], d['semester'][i], d['tuition'][i], d['room'][i], d['board'][i], d['fees'][i], d['aid'][i], d['f_res'][i], ret ))
+			retention =[d['r2'][i],d['r3'][i],d['r4'][i],d['r5'][i],d['r6'][i],d['r7'][i],d['r8'][i],d['r9'][i],d['r10'][i],d['r11'][i],d['r12'][i]]
+			cc.append(Cohort(d['name'][i], d['type'][i], d['nstud'][i], d['startsem'][i], d['semester'][i], d['tuition'][i], d['room'][i], d['board'][i], d['fees'][i], d['aid'][i], d['fracresidential'][i], retention ))
 	return cc
 
 def reset_tuition(cc):
@@ -295,10 +296,10 @@ def totalAid(cc,type):
 	tot_stud_aid = 0
 	for c in cc:
 		if c.type() == type:
-			tot_stud_aid+= c.financial_aid()
+			tot_stud_aid+= c.financialaid()
 	return tot_stud_aid
 
-def totalRoom(cc,type):
+def totalroom(cc,type):
 	# loop over cohorts and add room and board
 	tot_room = 0
 	for c in cc:
@@ -306,7 +307,7 @@ def totalRoom(cc,type):
 			tot_room+= c.room()
 	return tot_room
 
-def totalBoard(cc,type):
+def totalboard(cc,type):
 	# loop over cohorts and add room and board
 	tot_board = 0
 	for c in cc:
@@ -314,7 +315,7 @@ def totalBoard(cc,type):
 			tot_board+= c.board()
 	return tot_board
 
-def totalNumStudents(cc,type):
+def totalnumstudents(cc,type):
 	# loop over cohorts and add students
 	tot_nstud = 0
 	for c in cc:
@@ -322,7 +323,7 @@ def totalNumStudents(cc,type):
 			tot_nstud+= c.nstud()
 	return tot_nstud
 
-def totalNumResidents(cc,type):
+def totalnumresidents(cc,type):
 	# loop over cohorts and add residents
 	tot_nres = 0
 	for c in cc:
@@ -330,66 +331,7 @@ def totalNumResidents(cc,type):
 			tot_nres+= c.nres()
 	return tot_nres
 
-#
-#def drate(cc):
-#	return tot_aid(cc)/tot_tui(cc)
 
-def print_cohorts(cc):
-	cc.sort(key= lambda x: (x._startSemester, -x._currentSemester))
-	for c in cc:
-		c.print_c()
-		
-#def print_budget(cc):
-#	print('tuition:\t% 11.2f' % (tot_tui(cc)))
-#	print('stud. aid:\t% 11.2f' % (tot_aid(cc)))
-#	print('net trev.:\t% 11.2f'% (tot_net_trev(cc)))
-#	print('fees:   \t% 11.2f'% (tot_fees(cc)))
-#	print('randb:  \t% 11.2f' % (tot_randb(cc)))
-#	print('net rev.:\t% 11.2f' % (tot_net_rev(cc)))
-#
-#
-#def print_4yr_report(f1,s1,f2,s2,f3,s3,f4,s4,sep):
-#	y1 = s1+f1
-#	y2 = s2+f2
-#	y3 = s3+f3
-#	y4 = s4+f4
-#	print('f nstud:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_nstud(f1),sep,tot_nstud(f2),sep,tot_nstud(f3),sep,tot_nstud(f4) ))
-#	print('s nstud:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_nstud(s1),sep,tot_nstud(s2),sep,tot_nstud(s3),sep,tot_nstud(s4) ))
-#	print('tuition:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_tui(y1),sep,tot_tui(y2),sep,tot_tui(y3),sep,tot_tui(y4) ))
-#	print('stud. aid:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_aid(y1),sep,tot_aid(y2),sep,tot_aid(y3),sep,tot_aid(y4) ))
-#	print('net trev.:%s%12.2f%s%12.2f%s%12.2f%s%12.2f'% (sep,tot_net_trev(y1),sep,tot_net_trev(y2),sep,tot_net_trev(y3),sep,tot_net_trev(y4) ))
-#	print('f ngmsa:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_msa_nstud(f1),sep,tot_msa_nstud(f2),sep,tot_msa_nstud(f3),sep,tot_msa_nstud(f4) ))
-#	print('s ngmsa:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_msa_nstud(s1),sep,tot_msa_nstud(s2),sep,tot_msa_nstud(s3),sep,tot_msa_nstud(s4) ))
-#	print('msa tui.:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_msa_tui(y1),sep,tot_msa_tui(y2),sep,tot_msa_tui(y3),sep,tot_msa_tui(y4) ))
-#	print('msa aid:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_msa_aid(y1),sep,tot_msa_aid(y2),sep,tot_msa_aid(y3),sep,tot_msa_aid(y4) ))
-#	print('f ngmba:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_mba_nstud(f1),sep,tot_mba_nstud(f2),sep,tot_mba_nstud(f3),sep,tot_mba_nstud(f4) ))
-#	print('s ngmba:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_mba_nstud(s1),sep,tot_mba_nstud(s2),sep,tot_mba_nstud(s3),sep,tot_mba_nstud(s4) ))
-#	print('mba tui.:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_mba_tui(y1),sep,tot_mba_tui(y2),sep,tot_mba_tui(y3),sep,tot_mba_tui(y4) ))
-#	print('mba aid:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_mba_aid(y1),sep,tot_mba_aid(y2),sep,tot_mba_aid(y3),sep,tot_mba_aid(y4) ))
-#	print('f ngrad:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_gr_nstud(f1),sep,tot_gr_nstud(f2),sep,tot_gr_nstud(f3),sep,tot_gr_nstud(f4) ))
-#	print('s ngrad:%s%12d%s%12d%s%12d%s%12d' % (sep,tot_gr_nstud(s1),sep,tot_gr_nstud(s2),sep,tot_gr_nstud(s3),sep,tot_gr_nstud(s4) ))
-#	print('gr tui.:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_gr_tui(y1),sep,tot_gr_tui(y2),sep,tot_gr_tui(y3),sep,tot_gr_tui(y4) ))
-#	print('gr aid: %s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_gr_aid(y1),sep,tot_gr_aid(y2),sep,tot_gr_aid(y3),sep,tot_gr_aid(y4) ))
-#	print('fees:   %s%12.2f%s%12.2f%s%12.2f%s%12.2f'% (sep,tot_fees(y1),sep,tot_fees(y2),sep,tot_fees(y3),sep,tot_fees(y4) ))
-#	print('f nres: %s%12d%s%12d%s%12d%s%12d' % (sep,tot_nres(f1),sep,tot_nres(f2),sep,tot_nres(f3),sep,tot_nres(f4) ))
-#	print('s nres: %s%12d%s%12d%s%12d%s%12d' % (sep,tot_nres(s1),sep,tot_nres(s2),sep,tot_nres(s3),sep,tot_nres(s4) ))
-#	print('randb:  %s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_randb(y1),sep,tot_randb(y2),sep,tot_randb(y3),sep,tot_randb(y4) ))
-#	print('net rev.:%s%12.2f%s%12.2f%s%12.2f%s%12.2f' % (sep,tot_net_rev(y1),sep,tot_net_rev(y2),sep,tot_net_rev(y3),sep,tot_net_rev(y4) ))
-#	print('dis. rate:%s%12.3f%s%12.3f%s%12.3f%s%12.3f' % (sep,drate(y1),sep, drate(y2),sep,drate(y3),sep,drate(y4) ) ) 
-#
-#
-#printcohorts = False
-#
-#def print_report(f,s,y):
-#	global printcohorts
-#	print('\n')
-#	if printcohorts == True :
-#		print_cohorts(f)
-#		print_cohorts(s)
-#	print('f nstud:\t% 4d' % (tot_nstud(f)))
-#	print('s nstud:\t% 4d' % (tot_nstud(s)))
-#	print_budget(y)
-#	print('dis. rate:\t'+str(tot_aid(y)/tot_tui(y)))
 
 def gen_spring(fall, spring,df):
 	for c in fall:
@@ -397,8 +339,8 @@ def gen_spring(fall, spring,df):
 			cc = copy.deepcopy(c)
 			cc.age()
 			spring.append(cc)
-			csem = cc._currentSemester
-	add_cohorts(spring,df,csem)
+			csem = cc._currentsemester
+	addcohorts(spring,df,csem)
 		
 	
 def gen_nextfall(spring, df):
@@ -413,20 +355,27 @@ def gen_nextfall(spring, df):
 			nextfall.append(cc)
 	# add next freshman class - ex 202130
 	csemester = (oyear + deltayear)*100 + 30
-	add_cohorts(nextfall,df,csemester)
+	addcohorts(nextfall,df,csemester)
 #	reset_tuition(nextfall)
 	return(nextfall)	
 
                                 
-                            
-def print_yearly_budget(fall, spring):
+
+
+# display functions
+
+def printcohorts(cc):
+	cc.sort(key= lambda x: (x._firstsemester, -x._currentsemester))
+	for c in cc:
+		c.printcohort()
+                           
+def printyearlybudget(fall, spring):
 	year = fall + spring
 	yr = spring[0].year()
-	print_cohorts(year)
 	print("")
 	print("Budget summary %d-%d" % (yr-1, yr) )
-	print("n ug fall:\t %d" % int(totalNumStudents(fall,"ug")))
-	print("n ug spr.:\t %d" % int(totalNumStudents(spring,"ug")))
+	print("n ug fall:\t %d" % int(totalnumstudents(fall,"ug")))
+	print("n ug spr.:\t %d" % int(totalnumstudents(spring,"ug")))
 
 	netUGTuitionRev = 0.00
 	print("Blended Tuition Full-time: %8.2f" % totalTuition(year,"ug"))
@@ -451,71 +400,122 @@ def print_yearly_budget(fall, spring):
 	print("\tMBA Program aid: %8.2f" % totalAid(year,"MSA") )
 	netStudentRev -= totalAid(year,"MSA")
 
-	print("Room: %8.2f" % totalRoom(year,"ug"))
-	print("Board: %8.2f" % totalBoard(year,"ug"))
+	print("Room: %8.2f" % totalroom(year,"ug"))
+	print("Board: %8.2f" % totalboard(year,"ug"))
 	print("Fees: %8.2f" % totalFees(year,"ug"))
-	print("Net Student Revenue: %8.2f" % (netStudentRev+totalRoom(year,"ug")+totalBoard(year,"ug")+totalFees(year,"ug")) )
+	print("Net Student Revenue: %8.2f" % (netStudentRev+totalroom(year,"ug")+totalboard(year,"ug")+totalFees(year,"ug")) )
 
 
-printcohorts = False
+
+# expense functions 
+
+def get_f(d):
+	b = d.values[1]
+	return b
+
+def get_f_fte(d):
+	b = d.values[0]
+	return b
+
+def get_c(d):
+	c = get_salary(d) + get_benefits(d)
+	return c
+
+def get_salary(d):
+	s = d.values[2]
+	return s
+
+def get_benefits(d):
+	b = d.values[2]*0.40 
+	return b
+
+def cost(f,c,f_fte,N_s,Nbar, debug=False):
+	sections_per_student = 10.0
+	sections_per_fte = 8.0
+	if debug:
+		print "sections_per_student: ", sections_per_student
+		print "sections_per_fte: ", sections_per_fte
+		print "N_s: ", N_s
+		print "Nbar: ", Nbar
+		print "(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar
+		print "f: ",f
+		print "f_fte ", f_fte
+		print "c: ", c
+		print "(f*c/f_fte): ", (f*c/f_fte)
+	C = (f*c/f_fte)*(sections_per_student/sections_per_fte)*N_s/Nbar
+	return np.sum(C)
+
+# end expense functions
 
 
+
+print_cohorts = False
 
 def main(argv):
-	global printcohorts
-	inputfile = 'current.xlsx'
+	debug = False
+	global print_cohorts
+	inputfile = 'input/testinput.csv'
+	facinputfile = 'input/fac_dat_Schools_true_rel.xlsx'
 	outputfile = ''
 	excel_flag = False
 	sep = "\t"
+	simyear = 202130
 
 
 	try:
-		opts, args = getopt.getopt(argv,"hxcF:i:o:",["ifile=","ofile="])
+		opts, args = getopt.getopt(argv,"hxcF:i:o:y:",["ifile=","ofile="])
 	except getopt.GetoptError:
-		print 'simbud.py -h -x -c -F <osep> -i <inputfile> -o <outputfile>'
+		print 'sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS>'
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print 'simbud.py -h -x -c -F <osep> -i <inputfile> -o <outputfile>'
+			print 'sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS>'
 			sys.exit()
 		elif opt in ("-x"):
 			excel_flag = True
 		elif opt in ("-c"):
-			print('setting printcohorts')
-			printcohorts = True
-			print(printcohorts)
+			print_cohorts = True
 		elif opt in ("-F"):
 			sep = arg
 		elif opt in ("-i", "--ifile"):
 			inputfile = arg
 		elif opt in ("-o", "--ofile"):
 			outputfile = arg
-	simyear = int(args[0])
+		elif opt in ("-y"):
+			simyear = int(arg)
 
 	if excel_flag:
 		df = pd.read_excel(inputfile)
 	else:
 		df = pd.read_csv(inputfile,skipinitialspace=True)
-	fall1 = read_cohorts(df, simyear)
-#	print_cohorts(fall1)
-#	print(totalTuition(fall1))
-#	print(totalRoom(fall1))
-#	print(totalBoard(fall1))
-#	print(totalFees(fall1))
-#	print(totalAid(fall1))
-#	print(totalTuition(fall1)+totalRoom(fall1)+totalBoard(fall1)+totalFees(fall1)-totalAid(fall1))
+	fall1 = readcohorts(df, simyear)
 
+
+# read faculty data for expenses
+	expensedf = pd.read_excel(facinputfile)
+
+	f_fte = get_f_fte(expensedf)
+	f = get_f(expensedf)
+	c = get_c(expensedf)
 
 #do the first year
 
 	spring1 = []
 	gen_spring(fall1, spring1,df)
 	year1 = fall1 + spring1
-	if printcohorts == True :
+	if print_cohorts == True :
 		print("Year 1")
-		print_cohorts(fall1)
-		print_cohorts(spring1)
-	print_yearly_budget(fall1, spring1)
+		printcohorts(fall1)
+		printcohorts(spring1)
+	printyearlybudget(fall1, spring1)
+
+	nSpring = int(totalnumstudents(spring1,"ug"))
+	nFall = int(totalnumstudents(fall1,"ug"))
+	Nbar = 21
+	N_s = nFall if (nFall>nSpring) else nSpring
+	facultyCompensation = cost(f,c,f_fte,N_s,Nbar,debug)
+	print("Faculty compensation: %8.2f" % (facultyCompensation))
+	
 
 #
 ## do the next year
@@ -525,12 +525,11 @@ def main(argv):
 #	fall2 = gen_nextfall(spring1,df)
 #	gen_spring(fall2, spring2,df)
 #	year2 = fall2 + spring2
-#	if printcohorts == True :
+#	if print_cohorts == True :
 #		print("Year 2")
-#		print_cohorts(fall2)
-#		print_cohorts(spring2)
-#	print_yearly_budget(fall2, spring2)
-
+#		printcohorts(fall2)
+#		printcohorts(spring2)
+#	printyearlybudget(fall2, spring2)
 #
 ## do the next next year
 #
@@ -539,10 +538,10 @@ def main(argv):
 #	fall3 = gen_nextfall(spring2,df)
 #	gen_spring(fall3, spring3,df)
 #	year3 = fall3 + spring3
-#	if printcohorts == True :
+#	if print_cohorts == True :
 #		print("Year 3")
-#		print_cohorts(fall3)
-#		print_cohorts(spring3)
+#		printcohorts(fall3)
+#		printcohorts(spring3)
 #
 ## do the next next year
 #
@@ -551,14 +550,12 @@ def main(argv):
 #	fall4 = gen_nextfall(spring3,df)
 #	gen_spring(fall4, spring4,df)
 #	year4 = fall4 + spring4
-#	if printcohorts == True :
+#	if print_cohorts == True :
 #		print("Year 4")
-#		print_cohorts(fall4)
-#		print_cohorts(spring4)
-#
-#	print_4yr_report(fall1,spring1,fall2,spring2,fall3,spring3,fall4,spring4,sep)
-#
-#
+#		printcohorts(fall4)
+#		printcohorts(spring4)
+
+
 
 if __name__ == "__main__":
 	main(sys.argv[1:])

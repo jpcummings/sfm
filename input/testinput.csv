@@ -1,4 +1,4 @@
-stype,name,type,nstud,startsem,semester,tuition,room,board,fees,aid,f_res,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12
+stype,name,type,nstud,startsem,semester,tuition,room,board,fees,aid,fracresidential,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12
 cohort,Full time 201730,ug,3,201730,202130,19600,5312.5,2800,650,10954,0.83,0.95,0.93,0.96,0.89,0.98,1.07,0.97,0.06,0.58,0,0
 cohort,Full time 201830,ug,799,201830,202130,19600,5312.5,2800,650,11224,0.83,0.95,0.93,0.96,0.89,0.98,1.07,0.97,0.06,0.58,0,0
 cohort,Full time 201930,ug,683,201930,202130,19600,5312.5,2800,650,12362,0.83,0.95,0.93,0.96,0.89,0.98,1.07,0.97,0.06,0.58,0,0
