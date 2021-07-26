@@ -1,0 +1,27 @@
+==> Model 001:
+Steady state baseline.  
+Assumptions about incoming classes for 202130, 202230, 202330
+Hold incoming UG enrollments at
+Full time: 650
+Athletes: 107
+Transfers: 121/56 (Fall/Spring)
+with a discount rate of 67%
+Allow Grad programs to vary (from Chuck):
+			MBA		MSA
+2021(30/40):	38/10	45/6
+2022(30/40):	44/10	40/4
+2023(30/40):	50/10	35/2
+
+
+==> Model002:
+Use Model002 but add a new graduate program:
+202130:	20
+202230:	35
+202330:	50
+
+==> Model003:
+Increase incoming freshman class size.  Hold everything else as in Model001, but change fulltime non-athlete freshman enrollment from 650 to 718.
+
+==> Model004:
+Model001, but retention drops by 0.5% across all years.
+

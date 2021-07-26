@@ -1,0 +1,15 @@
+When populating input file:
+startsem is the semester of entry for this cohort
+semester is the "current" semester taht the data on the rest of the line refers to.  For future, incoming cohorts this would be the same as startsem
+
+
+open questions:
+how to model increases for fees, aid, and fraction resident?
+check avg. number of credit/semester for grad students.
+check grad student retention.
+models for:
+	endowed scholarships
+	Part-time and summer revenue
+	Part-time nursing
+	Study abroad
+
