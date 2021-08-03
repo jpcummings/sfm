@@ -4,30 +4,7 @@ import sys, getopt
 import numpy as np
 import pandas as pd
 import copy
-
-
-# tuition from factbook and (wepage for year ending 2022 [https://www.siena.edu/offices/business-services/student-accounts/tuition-fees-room-board/])
-# UG
-# 2017
-# 2018: 17728/35435 
-# 2019: 18338/36675
-# 2020: 19027.5/38055
-# 2021: 19600/39200
-# 2022: 19962.5/39925
-#
-# grad per credit hour - MSA
-# 2018: 1181
-# 2019: 1222.5
-# 2020: 1268.5
-# 2021: 1306
-# 2022: 1330
-#
-# grad per credit hour - MBA
-# 2018: -
-# 2019: -
-# 2020: 900
-# 2021: 900
-# 2022: 900
+import trb
 
 
 
@@ -47,7 +24,7 @@ class Cohort:
 		self._fracresidential = fracresidential 
 		self._retention = retention
 
-		self._tuition = getTuition(self.year(), self.type())
+		self._tuition = trb.getTuition(self.year(), self.type())
 
 		self._meansecsize = 22  # set section size to 21 for now
 		self._facultyfte = facultydf.values[0]
@@ -63,23 +40,13 @@ class Cohort:
 		print("%d %s, %s, %d, %d, %d, %6.2f, %6.2f, %6.2f, %6.2f %6.2f %6.2f" % (self.isemester(), self._name,self._type,self._numstudents,self._firstsemester,self._currentsemester,self._tuition,self._room,self._board, self._fees, self._aid, self._fracresidential))
 		# print('isemester: '+str(c.isemester()))
 
-	def getprefix(self):
-		# assumes for of name if prefix_semester
-		return self._name.partition('_')[0]
-
 	def type(self):
 		return self._type
-
-	def isgrad(self):
-		if self._type == "grad":
-			return True
-		else:
-			return False
 
 	def nstud(self):
 		return self._numstudents
 
-	def numberresidential(self):
+	def nresid(self):
 		return self._fracresidential*self._numstudents
 
 	def tuition(self):
@@ -116,6 +83,9 @@ class Cohort:
 
 	def year(self):
 		return self._currentsemester/100
+
+	def semester(self):   
+		return self._currentsemester%100  # returns 30 for fall semester, 40 for spring, (20 for summer)
 
 	def setfaculty(self, facultydf):
 		# faculty df read from excel file, each colum represents a faculty "cohort": 
@@ -172,7 +142,7 @@ class Cohort:
 
 		#update values
 		
-		self._tuition = getTuition(cyear,self._type)
+		self._tuition = trb.getTuition(cyear,self._type)
 		self._numstudents = self._retention[self.isemester()-1]*self._numstudents  # QQ: need to add in transfers
 		self._room = 1.0275*self._room # QQ: how to model r&b increases?
 		self._board = 1.0275*self._board # QQ: how to model r&b increases?
@@ -183,55 +153,6 @@ class Cohort:
 		return self
 
 # end of cohort definition
-
-def getTuition(year, type):
-	UGTuition = {
-			2017:17305,	# 17305.5
-			2018:17728,	# 17876.5
-			2019:18338,	# 18487.5
-			2020: 19027.5,	# 19177.5
-			2021: 19600,	# 19748.5
-			2022: 19962.5,	# 20336.5
-			2023: 20561,	# 3% increase
-			2024: 21178	# 3% increase
-	}
-	GradTuition = {
-			2017: 17163,	# 17305.5
-			2018: 17717,	# 17876.5
-			2019: 18337,	# 18487.5
-			2020: 19027,	# 19177.5
-			2021: 19692,	# 19748.5
-			2022: 20381,	# 20336.5
-			2023: 21094,	# 20946.5
-			2024: 21832	# 21597.0
-	}
-	MSATuition = {
-			2018: 10629,	# 1181/cr
-			2019: 10998,	# 1222/cr
-			2020: 11416.5,	# 1268.5/cr (9 cr/sem for 3 sem?)
-			2021: 11754,	# 1306/cr
-			2022: 12106,	# (assume 3% increases)
-			2023: 12470,	#
-			2024: 13218	#
-	}
-	MBATuition = {
-			2017: 0,	# 0
-			2018: 0,	# 0
-			2019: 0,	# 0
-			2020: 10800,	# 900/cr  (12 cr/sem for 4 sem?)
-			2021: 10800,	# 900/cr
-			2022: 10800,	# 
-			2023: 10800,	# 
-			2024: 10800	# 
-	}
-	tuition = UGTuition
-	if type == "grad" :
-		tuition = GradTuition
-	elif type == "MSA":
-		tuition = MSATuition
-	elif type == "MBA":
-		tuition = MSATuition
-	return tuition[year]
 
 
 def readcohorts(d, semester, facdfs):
@@ -259,70 +180,15 @@ def reset_tuition(cc):
 
 
 #
-# functions to return "fixed" revenues
-#
-
-def endowedScholarships(year):
-	scholarship = {
-		2018: 3153250,
-		2019: 3153250,
-		2020: 3153250,
-		2021: 3153250,
-		2022: 3153250,
-		2023: 3153250,
-		2024: 3153250,
-		2025: 3153250,
-	}
-	return(scholarship[year])
-
-def PTandSummer(year):
-	ptandsummer = {
-		2018: 2249697,
-		2019: 2249697,
-		2020: 2249697,
-		2021: 2249697,
-		2022: 2249697,
-		2023: 2249697,
-		2024: 2249697,
-		2025: 2249697,
-	}
-	return(ptandsummer[year])
-
-def PTNursing(year):
-	ptnursing = {
-		2018: 193725,
-		2019: 193725,
-		2020: 193725,
-		2021: 193725,
-		2022: 193725,
-		2023: 0,
-		2024: 0,
-		2025: 0,
-	}
-	return(ptnursing[year])
-
-def StudyAbroadNet(year):
-	studyabroadnet = {
-		2018: 1000000,
-		2019: 1000000,
-		2020: 1000000,
-		2021: 1000000,
-		2022: 1000000,
-		2023: 1000000,
-		2024: 1000000,
-		2025: 1000000,
-	}
-	return(studyabroadnet[year])
-
-#
 # summary function for lists of cohorts, by type
 #
+
 def totalTuition(cc,type):
 	# loop over cohorts and add tuition and fees
 	tot_tui = 0
 #	print(type)
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_tui+= c.tuition()
 	return tot_tui
 
@@ -330,7 +196,7 @@ def totalFees(cc,type):
 	# loop over cohorts and add tuition and fees
 	tot_fees = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_fees+= c.fees()
 	return tot_fees
 
@@ -338,43 +204,61 @@ def totalAid(cc,type):
 	# loop over cohorts and add aid
 	tot_stud_aid = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_stud_aid+= c.financialaid()
 	return tot_stud_aid
 
-def totalroom(cc,type):
+def totalRoom(cc,type):
 	# loop over cohorts and add room and board
 	tot_room = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_room+= c.room()
 	return tot_room
 
-def totalboard(cc,type):
+def totalBoard(cc,type):
 	# loop over cohorts and add room and board
 	tot_board = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_board+= c.board()
 	return tot_board
 
-def totalnumstudents(cc,type):
+def totalNumStudents(cc,type):
 	# loop over cohorts and add students
 	tot_nstud = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_nstud+= c.nstud()
 	return tot_nstud
 
-def totalnumresidents(cc,type):
+def totalNumResidents(cc,type):
 	# loop over cohorts and add residents
 	tot_nres = 0
 	for c in cc:
-		if c.type() == type:
+		if (type == 'all' or c.type() == type):
 			tot_nres+= c.nres()
 	return tot_nres
 
-def totalfacultycost(cc,type="all"):
+def totalNetTuitionRev(cc,type="all"):
+	year = cc
+	yr = cc[0].year()
+
+	if type == "ug":
+		netUGTuitionRev = 0.00
+		netUGTuitionRev += totalTuition(year,type)
+		netUGTuitionRev -= totalAid(year,type)
+		netUGTuitionRev -= trb.endowedScholarships(yr)
+		netTuitionRev = netUGTuitionRev
+	elif type == "MBA" or type == "MSA":
+		netTuitionRev  = 0.0
+		netTuitionRev += totalTuition(year,type)
+		netTuitionRev -= totalAid(year,type)
+
+	return netTuitionRev
+	
+
+def totalFacultyCost(cc,type="all"):
 	# loop over cohorts and add facultycost
 	tot_faccost = 0
 	for c in cc:
@@ -418,18 +302,18 @@ def gen_nextfall(spring, df, facdfs):
 
 # display functions
 
-def printcohorts(cc):
+def printCohorts(cc):
 	cc.sort(key= lambda x: (x._firstsemester, -x._currentsemester))
 	for c in cc:
 		c.printcohort()
                            
-def printyearlybudget(fall, spring):
+def printYearlyBudget(fall, spring):
 	year = fall + spring
 	yr = spring[0].year()
 	print("")
 	print("Budget summary %d-%d" % (yr-1, yr) )
 	for type in ["ug", "MSA", "MBA"] :
-		print("n %s fall/spr:\t %d/%d" % ( type, int(totalnumstudents(fall, type)), int(totalnumstudents(spring,type)) ) )
+		print("n %s fall/spr:\t %d/%d" % ( type, int(totalnumStudents(fall, type)), int(totalnumStudents(spring,type)) ) )
 
 	netUGTuitionRev = 0.00
 	print("Blended Tuition Full-time: %8.2f" % totalTuition(year,"ug"))
@@ -441,11 +325,11 @@ def printyearlybudget(fall, spring):
 	netStudentRev = netUGTuitionRev
 	print("Net FT Undergraduate Tuition Revenue: %8.2f" % (netUGTuitionRev))
 
-	print("Part-time and Summer: %8.2f" % PTandSummer(yr))
+	print("Part-time and Summer: %8.2f" % trb.PTandSummer(yr))
 	netStudentRev +=PTandSummer(yr)
-	print("Part-time Nursing Program: %8.2f" % PTNursing(yr))
+	print("Part-time Nursing Program: %8.2f" % trb.PTNursing(yr))
 	netStudentRev += PTNursing(yr)
-	print("Foreign Study Abroad-Net: %8.2f" % StudyAbroadNet(yr))
+	print("Foreign Study Abroad-Net: %8.2f" % trb.StudyAbroadNet(yr))
 	netStudentRev += StudyAbroadNet(yr)
 	print("MSA Program: %8.2f" % totalTuition(year,"MSA") )
 	netStudentRev += totalTuition(year,"MSA") 
@@ -454,10 +338,75 @@ def printyearlybudget(fall, spring):
 	print("\tMBA Program aid: %8.2f" % totalAid(year,"MSA") )
 	netStudentRev -= totalAid(year,"MSA")
 
-	print("Room: %8.2f" % totalroom(year,"ug"))
-	print("Board: %8.2f" % totalboard(year,"ug"))
+	print("Room: %8.2f" % totalRoom(year,"ug"))
+	print("Board: %8.2f" % totalBoard(year,"ug"))
 	print("Fees: %8.2f" % totalFees(year,"ug"))
-	print("Net Student Revenue: %8.2f" % (netStudentRev+totalroom(year,"ug")+totalboard(year,"ug")+totalFees(year,"ug")) )
+	print("Net Student Revenue: %8.2f" % (netStudentRev+totalRoom(year,"ug")+totalBoard(year,"ug")+totalFees(year,"ug")) )
+
+
+def printYear(dat, year, type="all"):
+	foundyear = False
+	for yr in dat:
+		if yr[0].year() == year:
+			foundyear = True
+			print '%d ' % yr[0].year(),
+	if not foundyear:
+		sys.exit("cannot find year %d to output\n" % year)
+
+
+def printType(dat, year, type="all"):
+	foundyear = False
+	for yr in dat:
+		if yr[0].year() == year:
+			foundyear = True
+			print '%6.0f ' % totalNumStudents(yr,type),
+			print '%6.0f ' % totalTuition(yr,type),
+			print '%6.0f ' % totalAid(yr,type),
+			print '%6.0f ' % totalRoom(yr,type),
+			print '%6.0f ' % totalBoard(yr,type),
+			print '%6.0f ' % totalFees(yr,type),
+	if not foundyear:
+		sys.exit("cannot find year %d to output\n" % year)
+
+def printNetStudRev(dat,year):
+	# print (tuition - aid  + room + board + fees) (ug and grad) + ptand summer + pt nursing + study abroad  - endowed scholarships
+	foundyear = False
+	for yr in dat:
+		if yr[0].year() == year:
+			foundyear = True
+			tot = totalTuition(yr,"all")
+			tot -= totalAid(yr,"all")
+			tot += totalRoom(yr,"all")
+			tot += totalBoard(yr,"all")
+			tot += totalFees(yr,"all")
+			tot += trb.PTandSummer(yr)
+			tot += trb.PTNursing(yr)
+			tot += trb.StudyAbroadNet(yr)
+			tot -= trb.endowedScholarships(yr)
+			print '%6.0f ' % tot,
+			
+def printFacultyCost(dat, year, type="all"):
+	foundyear = False
+	for yr in dat:
+		if yr[0].year() == year:
+			foundyear = True
+			print '%6.0f ' % totalFacultyCost(yr,type),
+	if not foundyear:
+		sys.exit("cannot find year %d to output\n" % year)
+
+def printAll(dat):
+	years = []
+	for yr in dat:
+		if years.count(yr[0].year()) == 0:
+			years.append(yr[0].year())
+	for year in years:
+		printYear(dat,year)
+		printType(dat,year,"ug")
+		printType(dat,year,"MSA")
+		printType(dat,year,"MBA")
+		printNetStudRev(dat,year)
+		printFacultyCost(dat,year)
+		print('')
 
 
 
@@ -555,55 +504,57 @@ def main(argv):
 		df = pd.read_excel(inputfile)
 	else:
 		df = pd.read_csv(inputfile,skipinitialspace=True)
-	fall1 = readcohorts(df, simyear, facdfs)
+	fall = readcohorts(df, simyear, facdfs)
 
 
-
+	# collect the data
+	springs = []
+	falls = []
+	yrs = []
 
 #do the first year
 
-	spring1 = []
-	gen_spring(fall1, spring1,df, facdfs)
-	year1 = fall1 + spring1
+	spring = []
+	gen_spring(fall, spring,df, facdfs)
+	year = fall + spring
+	springs.append(spring)
+	falls.append(fall)
+	yrs.append(year)
+
 	if print_cohorts == True :
 		print("Year 1")
-		printcohorts(fall1)
-		printcohorts(spring1)
-	printyearlybudget(fall1, spring1)
+		printCohorts(fall)
+		printCohorts(spring)
+		printYearlyBudget(fall, spring)
 
-	nSpring = int(totalnumstudents(spring1,"ug"))
-	nFall = int(totalnumstudents(fall1,"ug"))
-	Nbar = 21
-	N_s = nFall if (nFall>nSpring) else nSpring
-	N_s = (nFall+nSpring)/2.0
-	facultyCompensation = cost(f,c,f_fte,N_s,Nbar,debug)
-	print("Faculty compensation (ug): %8.2f" % (totalfacultycost(year1,"ug")))
-	print("Faculty compensation (MBA): %8.2f" % (totalfacultycost(year1,"MBA")))
-	print("Faculty compensation (MSA): %8.2f" % (totalfacultycost(year1,"MSA")))
+		print("Faculty compensation (ug): %8.2f" % (totalFacultyCost(year,"ug")))
+		print("Faculty compensation (MBA): %8.2f" % (totalFacultyCost(year,"MBA")))
+		print("Faculty compensation (MSA): %8.2f" % (totalFacultyCost(year,"MSA")))
 	
 
 #
 ## do the next years
 #
 
-	for yr in range(3):
-		fall2 = []
-		spring2 = []
-		fall2 = gen_nextfall(spring1,df, facdfs)
-		gen_spring(fall2, spring2,df, facdfs)
-		year2 = fall2 + spring2
+	for yr in range(5):
+		nextfall = []
+		nextspring = []
+		nextfall = gen_nextfall(spring,df, facdfs)
+		gen_spring(nextfall, nextspring,df, facdfs)
+		nextyear = nextfall + nextspring
 		if print_cohorts == True :
 			print("Year %d" % (2+yr))
-			printcohorts(fall2)
-			printcohorts(spring2)
-		printyearlybudget(fall2, spring2)
-		print("Faculty compensation (ug): %8.2f" % (totalfacultycost(year2,"ug")))
-		print("Faculty compensation (MBA): %8.2f" % (totalfacultycost(year2,"MBA")))
-		print("Faculty compensation (MSA): %8.2f" % (totalfacultycost(year2,"MSA")))
-		fall1 = fall2
-		spring1 = spring2
+			printCohorts(nextfall)
+			printCohorts(nextspring)
+			printYearlyBudget(nextfall, nextspring)
+			print("Faculty compensation (ug): %8.2f" % (totalFacultyCost(nextyear,"ug")))
+			print("Faculty compensation (MBA): %8.2f" % (totalFacultyCost(nextyear,"MBA")))
+			print("Faculty compensation (MSA): %8.2f" % (totalFacultyCost(nextyear,"MSA")))
+#		fall = nextfall
+		spring = nextspring
+		yrs.append(nextyear)
 
-
+	printAll(yrs)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
