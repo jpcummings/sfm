@@ -1,27 +1,61 @@
-==> Model 001:
-Steady state baseline.  
-Assumptions about incoming classes for 202130, 202230, 202330
-Hold incoming UG enrollments at
-Full time: 650
-Athletes: 107
-Transfers: 121/56 (Fall/Spring)
-with a discount rate of 67%
-Allow Grad programs to vary (from Chuck):
-			MBA		MSA
-2021(30/40):	38/10	45/6
-2022(30/40):	44/10	40/4
-2023(30/40):	50/10	35/2
+Model006-in.csv
+	"Add Grads"
+	Based on Model000c baseline
+	start a new grad prog. Business School expenses and MBA tuition model
+	2022	0
+	2023	20
+	2024	40
+	2025	60
+Model005-in.csv
+	"Add undergrads"
+	Based on Model000c baseline
+	start a new UG prog
+	2022	0
+	2023	20
+	2024	40
+	2025	60
+Model004-in.csv
+	"Discount rate"
+	Based on Model000c baseline
+	Decrease each freshman class due to decreasing discount rate:
+	2022	841	(65.2%)	Δ = -31
+	2023	802	(63.6%)	Δ = -30
+	2024	767	(62.1%)	Δ = -26
+	2025	731	(60.5%)	Δ = -56
+=>	2026	727	(59.1%)	Δ = -61 <= not in
+	130 transfers each fall
+	grads const
+Model000c-in.csv
+	"Baseline"
+	New baseline model from Ned.  Uses new incoming classes:
+	2022	872
+	2023	832
+	2024	793
+	2025	787
+=>	2026	788 <= not in
+	130 transfers each fall
+	grads const
+	Constant freshman discount rate of 66.6%
 
+Model003-in.csv
+	Estimate of effect of decreasing discount rate.
+Model000b-in.csv
+	improved Model000a baseline
+	uses Neds incoming estimates (from Anne?)
+Model000a-in.csv
+	improved Model000 baseline
+	includes UG transfers
+	820 incoming each year
+Model001.csv
+	"New grad program"
+	Based on Model000 baseline
+Model002-in.csv
+	"New undergrad program"
+	Based on Model000 baseline
+Model000-in.csv
+	Baseline
+	885 incoming
+	no transfers! <=fix!
 
-==> Model002:
-Use Model002 but add a new graduate program:
-202130:	20
-202230:	35
-202330:	50
-
-==> Model003:
-Increase incoming freshman class size.  Hold everything else as in Model001, but change fulltime non-athlete freshman enrollment from 650 to 718.
-
-==> Model004:
-Model001, but retention drops by 0.5% across all years.
-
+testinput.csv
+fac_dat_Schools_true_rel.xlsx
