@@ -214,17 +214,17 @@ def addcohorts(cc,d,semester, facdfs):
 
 def cleanCohorts(cc):
 	removeEmptyCohorts(cc)
-	correctResidentFrac(cc)
+#	correctResidentFrac(cc)
 
 def removeEmptyCohorts(cc):
 	for c in cc:
 		if c.nstud() == 0:
 			cc.remove(c)
 
-def correctResidentFrac(sem):
+def correctResidentFrac(sem,nresidmax):
 	'''Correct resident fractions of all cohorst in a semester to avoid going over capacity'''
 	# assume sem is an entire semester.
-	nresidmax = 2454   
+	# nresidmax = 2454   
 	tot_nres = 0
 	correction = 1
 
@@ -307,7 +307,17 @@ def totalNumStudents(cc,type):
 			tot_nstud+= c.nstud()
 	return tot_nstud
 
-def totalNumResidents(cc,type):
+def totalNumResidents(cc,type,nresidmax):
+	# loop over cohorts and add residents
+	tot_nres = 0
+	correctResidentFrac(cc, nresidmax)
+	for c in cc:
+		if (type == 'all' or c.type() == type):
+			tot_nres+= c.nresid()
+	return tot_nres 
+
+
+def totalNumResidentsOLD(cc,type):
 	nresidmax = 9999 # 2454
 	# loop over cohorts and add residents
 	tot_nres = 0
@@ -584,7 +594,9 @@ def writeHeaderExcel(title):
 	row+=1;sheet1.write(row, 0, "Average MBA student Enrollment")
 	row+=1;sheet1.write(row, 0, "Average Grad student Enrollment")
 	row+=1;sheet1.write(row, 0, "Average Master Programs Credit Hours")
-	row+=1;sheet1.write(row, 0, "Resident Students/Capacity")
+	row+=1;sheet1.write(row, 0, "Total Enrollment")
+	row+=1;sheet1.write(row, 0, "Resident Students Demand")
+	row+=1;sheet1.write(row, 0, "Resident Students Actual")
 	row+=1;sheet1.write(row, 0, "Board Participants")
 	row+=1;sheet1.write(row, 0, "Average Part Time Credit Hours")
 	row+=1
@@ -674,7 +686,9 @@ def writeYearExcel(fall, spring, col = 1):
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"MBA"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"grad"))/2, integer )
 	row+=1
-	row+=1; sheet1.write(row, col, totalNumResidents(yr,"ug")/2, integer )
+	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"ug")+totalNumStudents(yr,"MSA")+totalNumStudents(yr,"MBA")+totalNumStudents(yr,"grad"))/2, integer )
+	row+=1; sheet1.write(row, col, (totalNumResidents(fall,"ug",9999)+totalNumResidents(spring,"ug",9999))/2, integer )
+	row+=1; sheet1.write(row, col, (totalNumResidents(fall,"ug",2454)+totalNumResidents(spring,"ug",2454))/2, integer )
 
 	row+=5
 	row+=1; sheet1.write(row, col, totalTuition(yr,"ug"), currency); iTuition = i2e(row,col)
