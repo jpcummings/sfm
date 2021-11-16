@@ -30,9 +30,14 @@ class Cohort:
 		self._tuition = er.getTuition(self.year(), self.type())
 
 		self._meansecsize = 21  # set section size to 21 for now
+		self._sections_per_student = 10.0  # set sections per student to 10.0 
+		self._sections_per_fte = 8.0  # set sections per FTE to 8.0                                 
 		self._facultyfte = facultydf.values[0]
 		self._facultymix = facultydf.values[1]
 		self._facultysalary = facultydf.values[2]
+
+		self._sectionsneeded = int(nstud) / self._meansecsize * self._sections_per_student / 2 # Assume sections_per_student is for the full year
+
 		# base salaries from 2020.  Assume 2.5% raises
 		if self._type == 'grad':
 			self._facultymix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.333, 0.333, 0.333, 0, 0, 0, 0, 0, 0]
@@ -85,19 +90,19 @@ class Cohort:
 		return board
 
 	def isemester(self):
-		fyear = self._firstsemester/100
+		fyear = int(self._firstsemester/100) 
 		fsem = self._firstsemester%100
-		cyear = self._currentsemester/100
+		cyear = int(self._currentsemester/100) 
 		csem = self._currentsemester%100
-		return (csem-fsem)/10 + 2*(cyear-fyear)
+		return int( (csem-fsem)/10 + 2*(cyear-fyear) ) 
 
 	def iyear(self):
-		fyear = self._firstsemester/100
-		cyear = self._currentsemester/100
+		fyear = int(self._firstsemester/100) 
+		cyear = int(self._currentsemester/100) 
 		return (cyear-fyear)
 
 	def year(self):
-		return self._currentsemester/100
+		return int(self._currentsemester/100) 
 
 	def semester(self):   
 		return self._currentsemester%100  # returns 30 for fall semester, 40 for spring, (20 for summer)
@@ -115,52 +120,56 @@ class Cohort:
 	def setmeansectionsize(self, size):
 		self._meansecsize = size
 
+	def sectionsneeded(self):
+		self._sectionsneeded = float(self._numstudents) / self._meansecsize * self._sections_per_student / 2 # Assume sections_per_student is for the year
+		return self._sectionsneeded 
+
 	def facultysalary(self):
-		sections_per_student = 10.0
-		sections_per_fte = 8.0
+		sections_per_student = self._sections_per_student
+		sections_per_fte = self._sections_per_fte
 		f = self._facultymix
 		c = self._facultysalary/2.0  # assume 1/2 year
 		f_fte = self._facultyfte
 		N_s = self._numstudents
 		Nbar = self._meansecsize
 		if self._debug:
-			print "sections_per_student: ", sections_per_student
-			print "sections_per_fte: ", sections_per_fte
-			print "N_s: ", N_s
-			print "Nbar: ", Nbar
-			print "(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar
-			print "f: ",f
-			print "f_fte ", f_fte
-			print "c: ", c
-			print "(f*c/f_fte): ", (f*c/f_fte)
+			print ("sections_per_student: ", sections_per_student)
+			print ("sections_per_fte: ", sections_per_fte)
+			print ("N_s: ", N_s)
+			print ("Nbar: ", Nbar)
+			print ("(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar)
+			print ("f: ",f)
+			print ("f_fte ", f_fte)
+			print ("c: ", c)
+			print ("(f*c/f_fte): ", (f*c/f_fte))
 		C = (f*c/f_fte)*(sections_per_student/sections_per_fte)*N_s/Nbar
 		return np.sum(C)
 
 	def facultycost(self):
-		sections_per_student = 10.0
-		sections_per_fte = 8.0
+		sections_per_student = self._sections_per_student
+		sections_per_fte = self._sections_per_fte
 		f = self._facultymix
 		c = 1.4*self._facultysalary/2.0  # assume benefits 0.4*salary and 1/2 year
 		f_fte = self._facultyfte
 		N_s = self._numstudents
 		Nbar = self._meansecsize
 		if self._debug:
-			print "sections_per_student: ", sections_per_student
-			print "sections_per_fte: ", sections_per_fte
-			print "N_s: ", N_s
-			print "Nbar: ", Nbar
-			print "(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar
-			print "f: ",f
-			print "f_fte ", f_fte
-			print "c: ", c
-			print "(f*c/f_fte): ", (f*c/f_fte)
+			print ("sections_per_student: ", sections_per_student)
+			print ("sections_per_fte: ", sections_per_fte)
+			print ("N_s: ", N_s)
+			print ("Nbar: ", Nbar)
+			print ("(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar)
+			print ("f: ",f)
+			print ("f_fte ", f_fte)
+			print ("c: ", c)
+			print ("(f*c/f_fte): ", (f*c/f_fte))
 		C = (f*c/f_fte)*(sections_per_student/sections_per_fte)*N_s/Nbar
 		return np.sum(C)
 
 
 	# bump this group of students by a semester
 	def age(self):
-		cyear = self._currentsemester/100
+		cyear = int(self._currentsemester/100) 
 		csem = self._currentsemester%100
 		if csem == 30:
 			#add 10 to semester
@@ -256,6 +265,15 @@ def reset_tuition(cc):
 #
 # summary function for lists of cohorts, by type
 #
+
+def totalSections(cc,type):
+	# loop over cohorts and add required sections
+	tot_sec = 0
+#	print(type)
+	for c in cc:
+		if (type == 'all' or c.type() == type):
+			tot_sec+= c.sectionsneeded()
+	return tot_sec
 
 
 def totalTuition(cc,type):
@@ -440,46 +458,46 @@ def printYearlyBudget(fall, spring):
 
 def printYear(dat, year, hdr=False):
 	if hdr:
-		print 'year',
+		print ('year',)
 		return
 	foundyear = False
 	for yr in dat:
 		if yr[0].year() == year:
 			foundyear = True
-			print '%d ' % yr[0].year(),
+			print ('%d ' % yr[0].year(),)
 	if not foundyear:
 		sys.exit("cannot find year %d to output\n" % year)
 
 
 def printType(dat, year, type="all",hdr=False):
 	if hdr:
-		print 'nstud%s' % type,
-		print 'tuition%s' % type,
-		print 'aid%s' % type,
-		print 'room%s' % type,
-		print 'board%s' % type,
-		print 'fees%s' % type,
-		print 'netrev%s' % type,
-		print 'faccomp%s' % type,
+		print ('nstud%s' % type,)
+		print ('tuition%s' % type,)
+		print ('aid%s' % type,)
+		print ('room%s' % type,)
+		print ('board%s' % type,)
+		print ('fees%s' % type,)
+		print ('netrev%s' % type,)
+		print ('faccomp%s' % type,)
 		return
 	foundyear = False
 	for yr in dat:
 		if yr[0].year() == year:
 			foundyear = True
-			print '%6.0f ' % totalNumStudents(yr,type),
-			print '%6.0f ' % totalTuition(yr,type),
-			print '%6.0f ' % totalAid(yr,type),
-			print '%6.0f ' % totalRoom(yr,type),
-			print '%6.0f ' % totalBoard(yr,type),
-			print '%6.0f ' % totalFees(yr,type),
-			print '%6.0f ' % (totalTuition(yr,type)-totalAid(yr,type)+totalRoom(yr,type)+totalBoard(yr,type)+totalFees(yr,type)),
-			print '%6.0f ' % totalFacultyCost(yr,type),
+			print ('%6.0f ' % totalNumStudents(yr,type),)
+			print ('%6.0f ' % totalTuition(yr,type),)
+			print ('%6.0f ' % totalAid(yr,type),)
+			print ('%6.0f ' % totalRoom(yr,type),)
+			print ('%6.0f ' % totalBoard(yr,type),)
+			print ('%6.0f ' % totalFees(yr,type),)
+			print ('%6.0f ' % (totalTuition(yr,type)-totalAid(yr,type)+totalRoom(yr,type)+totalBoard(yr,type)+totalFees(yr,type)),)
+			print ('%6.0f ' % totalFacultyCost(yr,type),)
 	if not foundyear:
 		sys.exit("cannot find year %d to output\n" % year)
 
 def printNetStudRev(dat,year,hdr=False):
 	if hdr:
-		print 'netstudrevenue',
+		print ('netstudrevenue',)
 		return
 	# print (tuition - aid  + room + board + fees) (ug and grad) + ptand summer + pt nursing + study abroad  - endowed scholarships
 	foundyear = False
@@ -495,17 +513,17 @@ def printNetStudRev(dat,year,hdr=False):
 			tot += er.PTNursing(yr)
 			tot += er.StudyAbroadNet(yr)
 			tot -= er.endowedScholarships(yr)
-			print '%6.0f ' % tot,
+			print ('%6.0f ' % tot,)
 			
 def printFacultyCost(dat, year, type="all",hdr=False):
 	if hdr:
-		print 'faccomp%s' % type,
+		print ('faccomp%s' % type,)
 		return
 	foundyear = False
 	for yr in dat:
 		if yr[0].year() == year:
 			foundyear = True
-			print '%6.0f ' % totalFacultyCost(yr,type),
+			print ('%6.0f ' % totalFacultyCost(yr,type),)
 	if not foundyear:
 		sys.exit("cannot find year %d to output\n" % year)
 
@@ -693,7 +711,7 @@ def writeYearExcel(fall, spring, col = 1):
 	row+=5
 	row+=1; sheet1.write(row, col, totalTuition(yr,"ug"), currency); iTuition = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalAid(yr,"ug"), currency); iAid = i2e(row,col)	
-	row+=1; sheet1.write(row, col, er.endowedScholarships(yr), currency); iEndowedScholarships = i2e(row,col)
+	row+=1; sheet1.write(row, col, er.endowedScholarships(year), currency); iEndowedScholarships = i2e(row,col) 
 	row+=1; sheet1.write(row, col, xlwt.Formula('{}-{}-{}'.format(iTuition,iAid,iEndowedScholarships)), currency ); iTotUGTuition = i2e(row,col)
 	
 	row+=1; sheet1.write(row, col, er.PTandSummer(year), currency ); iPTandSumm = i2e(row,col)
@@ -785,22 +803,22 @@ def get_salary(d):
 	return s
 
 def get_benefits(d):
-	b = d.values[2]*0.40 
+	b = d.values[2]*0.40         
 	return b
 
 def cost(f,c,f_fte,N_s,Nbar, debug=False):
-	sections_per_student = 10.0
-	sections_per_fte = 8.0
+	sections_per_student = c._sections_per_student 
+	sections_per_fte = c._sections_per_fte 
 	if debug:
-		print "sections_per_student: ", sections_per_student
-		print "sections_per_fte: ", sections_per_fte
-		print "N_s: ", N_s
-		print "Nbar: ", Nbar
-		print "(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar
-		print "f: ",f
-		print "f_fte ", f_fte
-		print "c: ", c
-		print "(f*c/f_fte): ", (f*c/f_fte)
+		print ("sections_per_student: ", sections_per_student)
+		print ("sections_per_fte: ", sections_per_fte)
+		print ("N_s: ", N_s)
+		print ("Nbar: ", Nbar)
+		print ("(sections_per_student/sections_per_fte)*N_s/Nbar: ", (sections_per_student/sections_per_fte)*N_s/Nbar)
+		print ("f: ",f)
+		print ("f_fte ", f_fte)
+		print ("c: ", c)
+		print ("(f*c/f_fte): ", (f*c/f_fte))
 	C = (f*c/f_fte)*(sections_per_student/sections_per_fte)*N_s/Nbar
 	return np.sum(C)
 
@@ -825,11 +843,11 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"hxcF:i:o:y:b:",["ifile=","ofile="])
 	except getopt.GetoptError:
-		print 'sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS> -b <basename>'
+		print ('sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS> -b <basename>')
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print 'sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS> -b <basename>'
+			print ('sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS> -b <basename>')
 			sys.exit()
 		elif opt in ("-x"):
 			excel_flag = True
@@ -850,6 +868,7 @@ def main(argv):
 
 # read faculty data for expenses
 	facultydf = pd.read_excel(facinputfile)
+	facultydf = facultydf.iloc[:,1:] # GLB first column contains description, not numbers; was failing when calculating benefits
 
 	f_fte = get_f_fte(facultydf)
 	f = get_f(facultydf)
@@ -886,6 +905,11 @@ def main(argv):
 	writeHeaderExcel(basename)
 	writeYearExcel(fall,spring,1)
 
+	# test print of sections needed
+	print("Total sections needed for Fall: {0:8.2f}".format(totalSections(fall,'all')))
+	print("Total sections needed for Spring: {0:8.2f}".format(totalSections(spring,'all')))
+	print("")
+
 	if print_cohorts == True :
 		print("Year 1")
 		printCohorts(fall)
@@ -908,6 +932,10 @@ def main(argv):
 		gen_spring(nextfall, nextspring,df, facdfs)
 		cleanCohorts(nextfall)
 		cleanCohorts(nextspring)
+		# test print of sections needed
+		print("Total sections needed for Fall: {0:8.2f}".format(totalSections(nextfall,'all')))
+		print("Total sections needed for Spring: {0:8.2f}".format(totalSections(nextspring,'all')))
+		print("")
 		writeYearExcel(nextfall,nextspring,yr+2)
 		nextyear = nextfall + nextspring
 		if print_cohorts == True :
