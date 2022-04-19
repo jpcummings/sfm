@@ -329,23 +329,34 @@ def ProgramFYCCOVID(year):
 		return exp[year]
 
 def GeneralOpsMaint(year):
+# Nobel Hall online in 2025: $7*sq ft, assume 40k sq ft => 280000
+# Need to put wellness center in also
 	exp = {
 		2021: 1988899,
 		2022: 2138899,
+		2023: 2203066,
+		2024: 2269158,
+		2025: 2617233,
+		2026: 2695750,
+		2027: 2776622,
 	}
-	if year > 2022:
-		year = 2022
-	return exp[year]
+	if year > 2027:
+		return exp[2027]*math.pow(1.03,(year-2027))  # assume 3% increase yearly after 2027 according to MJ Strunk
+	else:
+		return exp[year]
 
 def Utilities(year):
 	# electricity 
 	exp = {
 		2021: 1950000,
 		2022: 1950000,
+		2023: 2200000,
+		2024: 2450000,
 	}
-	if year > 2022:
-		year = 2022
-	return exp[year]
+	if year > 2024:
+		return exp[2024]*math.pow(1.10,(year-2024))  # assume 10% increase yearly after 2024 (wow!) according to MJ Strunk
+	else:
+		return exp[year]
 
 def DeferredMaint(year):
 	exp = {
