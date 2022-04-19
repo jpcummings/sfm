@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys, getopt
 import math
@@ -868,7 +868,8 @@ def main(argv):
 
 # read faculty data for expenses
 	facultydf = pd.read_excel(facinputfile)
-	facultydf = facultydf.iloc[:,1:] # GLB first column contains description, not numbers; was failing when calculating benefits
+	# facultydf = facultydf.iloc[:,1:] # GLB first column contains description, not numbers; was failing when calculating benefits
+	# Georges fix seems to have broken the ther calcs... all the vectors were missing the first element(!?)  fractions, salaries, ftes, etc
 
 	f_fte = get_f_fte(facultydf)
 	f = get_f(facultydf)
