@@ -330,15 +330,16 @@ def ProgramFYCCOVID(year):
 
 def GeneralOpsMaint(year):
 # Nobel Hall online in 2025: $7*sq ft, assume 40k sq ft => 280000
+# Wellness Center online in 2025: $7/sq.ft, assume 10k (too large?) => 70000
 # Need to put wellness center in also
 	exp = {
 		2021: 1988899,
 		2022: 2138899,
 		2023: 2203066,
 		2024: 2269158,
-		2025: 2617233,
-		2026: 2695750,
-		2027: 2776622,
+		2025: 2687233, # 2337233+280000+70000
+		2026: 2767850,
+		2027: 2850885,
 	}
 	if year > 2027:
 		return exp[2027]*math.pow(1.03,(year-2027))  # assume 3% increase yearly after 2027 according to MJ Strunk
