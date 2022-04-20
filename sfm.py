@@ -186,6 +186,7 @@ class Cohort:
 			# update room and board - 3% increase
 			self._room = 1.03*self._room # QQ: how to model r&b increases?
 			self._board = 1.03*self._board # QQ: how to model r&b increases?
+			self._facultysalary *= 1.025 # JPC - give faculty raises!
 		else:
 			print('bad semester in .age()')
 
@@ -837,7 +838,7 @@ def main(argv):
 	facinputfile = 'input/fac_dat_Schools_true_rel.xlsx'
 	excel_flag = False
 	sep = "\t"
-	simyear = 202130
+	simyear = 202230
 
 
 	try:
@@ -907,9 +908,9 @@ def main(argv):
 	writeYearExcel(fall,spring,1)
 
 	# test print of sections needed
-	print("Total sections needed for Fall: {0:8.2f}".format(totalSections(fall,'all')))
-	print("Total sections needed for Spring: {0:8.2f}".format(totalSections(spring,'all')))
-	print("")
+	# print("Total sections needed for Fall: {0:8.2f}".format(totalSections(fall,'all')))
+	# print("Total sections needed for Spring: {0:8.2f}".format(totalSections(spring,'all')))
+	# print("")
 
 	if print_cohorts == True :
 		print("Year 1")
@@ -934,9 +935,9 @@ def main(argv):
 		cleanCohorts(nextfall)
 		cleanCohorts(nextspring)
 		# test print of sections needed
-		print("Total sections needed for Fall: {0:8.2f}".format(totalSections(nextfall,'all')))
-		print("Total sections needed for Spring: {0:8.2f}".format(totalSections(nextspring,'all')))
-		print("")
+		# print("Total sections needed for Fall: {0:8.2f}".format(totalSections(nextfall,'all')))
+		# print("Total sections needed for Spring: {0:8.2f}".format(totalSections(nextspring,'all')))
+		# print("")
 		writeYearExcel(nextfall,nextspring,yr+2)
 		nextyear = nextfall + nextspring
 		if print_cohorts == True :
