@@ -80,7 +80,7 @@ def getTuition(year, type):
 			return tuition[year]
 	else:
 		if year > 2022:
-			return tuition[2022]*math.pow(1.025,(year-2022))  # assume 2.5% increase yearly after 2022
+			return tuition[2022]*math.pow(1.03,(year-2022))  # assume 3% increase yearly after 2022
 		else:
 			return tuition[year]
 
@@ -193,21 +193,33 @@ def GiftsGrantsOther(year):
 	return 0
 
 def InvestmentReturns(year):
+	# numbers from MJ Strunk email 4/20/2022
 	ret = {
 		2021: 2408057,
 		2022: 2229765,
+		2023: 2378168,
+		2024: 2600810,
+		2025: 2858366,
+		2026: 2938306,
+		2027: 3013365,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2027:
+		year = 2027
 	return ret[year]
 
 def EndowedGifts(year):
+	# numbers from MJ Strunk email 4/20/2022
 	ret = {
 		2021: 4392234,
 		2022: 4533300,
+		2023: 5175471,
+		2024: 5723241,
+		2025: 6283970,
+		2026: 6466648,
+		2027: 6632935,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2027:
+		year = 2027
 	return ret[year]
 
 def OtherResources(year):
@@ -329,9 +341,9 @@ def ProgramFYCCOVID(year):
 		return exp[year]
 
 def GeneralOpsMaint(year):
+# numbers from MJ Strunk email 4/20/2022
 # Nobel Hall online in 2025: $7*sq ft, assume 40k sq ft => 280000
 # Wellness Center online in 2025: $7/sq.ft, assume 10k (too large?) => 70000
-# Need to put wellness center in also
 	exp = {
 		2021: 1988899,
 		2022: 2138899,
@@ -347,15 +359,17 @@ def GeneralOpsMaint(year):
 		return exp[year]
 
 def Utilities(year):
-	# electricity 
+	# how much is electricity,  oil, gas(?)
+	# numbers from MJ Strunk email 4/20/2022
 	exp = {
 		2021: 1950000,
 		2022: 1950000,
-		2023: 2200000,
-		2024: 2450000,
+		2023: 2250000, # +300000 or 15%
+		2024: 2400000, # +150000 or 6%
+		2025: 2500000, # +100000 or 4%
 	}
 	if year > 2024:
-		return exp[2024]*math.pow(1.10,(year-2024))  # assume 10% increase yearly after 2024 (wow!) according to MJ Strunk
+		return exp[2025]*math.pow(1.10,(year-2025))  # assume 10% increase yearly after 2025 (wow!) according to MJ Strunk
 	else:
 		return exp[year]
 
@@ -369,12 +383,14 @@ def DeferredMaint(year):
 	return exp[year]
 
 def Food(year):
+	# numbers from MJ Strunk email 4/20/2022
 	ret = {
 		2021: 6582271,
 		2022: 8234610,
+		2023: 9361625,
 	}
 	if year > 2022:
-		return ret[2022]*math.pow(1.035,(year-2022))  # assume 3.5% increase yearly after 2022
+		return ret[2023]*math.pow(1.035,(year-2023))  # assume 4.5% increase yearly after 2023
 	else:
 		return ret[year]
 
@@ -397,12 +413,15 @@ def AssetRetirementObligation(year):
 	return exp[year]
 
 def Depreciation(year):
+	# numbers from MJ Strunk email 4/20/2022
 	ret = {
 		2021: 8089582,
 		2022: 7891233,
+		2023: 8460459,
+		2024: 8831738,
+		2025: 10904758,
+		2026: 12760341,
+		2027: 12056872,
 	}
-	if year > 2022:
-		return ret[2022]*math.pow(1.05,(year-2022))  # assume 5% increase yearly after 2022
-	else:
-		return ret[year]
+	return ret[year]
 
