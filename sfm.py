@@ -183,9 +183,9 @@ class Cohort:
 #			print(cyear*100+csem)
 #			print("bumping room from {} to {}".format(self._room, 1.03*self._room))
 			self._currentsemester = cyear*100+csem
-			# update room and board - 3% increase
-			self._room = 1.03*self._room # QQ: how to model r&b increases?
-			self._board = 1.03*self._board # QQ: how to model r&b increases?
+			# update room and board - 2.5% increase
+			self._room = 1.025*self._room # QQ: how to model r&b increases?
+			self._board = 1.025*self._board # QQ: how to model r&b increases?
 			self._facultysalary *= 1.025 # JPC - give faculty raises!
 		else:
 			print('bad semester in .age()')
@@ -834,7 +834,7 @@ def main(argv):
 	global print_cohorts
 	BASENAME = 'Untitled'
 	inputfile = 'input/Model000.csv'
-	outputfile = 'ourput/Model000.xls'
+	outputfile = 'output/Model000.xls'
 	facinputfile = 'input/fac_dat_Schools_true_rel.xlsx'
 	excel_flag = False
 	sep = "\t"
