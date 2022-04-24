@@ -73,6 +73,9 @@ def getTuition(year, type):
 	elif type == "MBA":
 		tuition = MBATuition
 
+	if type == "TE": # we get no tuition revenue from tuition exchange students
+		return 0
+
 	if type == "MBA":
 		if year > 2022:
 			return tuition[2022]  # assume no increase yearly after 2022
@@ -144,8 +147,8 @@ def StudyAbroadNet(year):
 
 def BundyAid(year):
 	aid = {
-		2021: 23000,
-		2022: 20500,
+		2021: 230000,
+		2022: 205000,
 	}
 	if year > 2022:
 		year = 2022
@@ -174,7 +177,7 @@ def COVIDDiscretionary(year):
 def AnnualFund(year):
 	fund = {
 		2021: 1725000,
-		2022: 1760000,
+		2022: 1625000, # adopted budget: 1760000, use projected (Apr 2022)
 	}
 	if year > 2022:
 		year = 2022
@@ -234,7 +237,7 @@ def OtherResources(year):
 def AthleticRevenue(year):
 	ret = {
 		2021: 0,
-		2022: 1185954,
+		2022: 1068954,  # adopted budget:1185954, use projected (Apr 2022)
 	}
 	if year > 2022:
 		year = 2022
@@ -301,7 +304,7 @@ def FYCCOVIDSalaries(year):
 def GeneralCollegeOperations(year):
 	ret = {
 		2021: 13797943,
-		2022: 14508067,
+		2022: 14511218, # adopted budget: 14508067, use projected (Apr 2022)
 	}
 	if year > 2022:
 		return ret[2022]*math.pow(1.015,(year-2022))  # assume 1.5% increase yearly after 2022
@@ -386,7 +389,7 @@ def Food(year):
 	# numbers from MJ Strunk email 4/20/2022
 	ret = {
 		2021: 6582271,
-		2022: 8234610,
+		2022: 8954319, # use projected (4/21/2022), the budget number was 8234610,
 		2023: 9361625,
 	}
 	if year > 2022:
@@ -407,9 +410,10 @@ def AssetRetirementObligation(year):
 	exp = {
 		2021: 125069,
 		2022: 129973,
+		2023: 135072,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2023:
+		year = 2023
 	return exp[year]
 
 def Depreciation(year):
