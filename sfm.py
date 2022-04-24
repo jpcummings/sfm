@@ -174,7 +174,6 @@ class Cohort:
 		if csem == 30:
 			#add 10 to semester
 			csem += 10
-#			print(cyear*100+csem)
 			self._currentsemester = cyear*100+csem
 		elif csem == 40:
 			#add 1 to year and set csem to 30
