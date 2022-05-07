@@ -261,23 +261,31 @@ def ReleaseTempRestrictedAssets(year):
 		year = 2022
 	return ret[year]
 
-def StaffAdminSalaries(year):
+
+def StaffAdminSalaries(year, sp=False):
 	ret = {
 		2021: 23724100,
 		2022: 26326046,
 	}
-	if year > 2022:
-		return ret[2022]*math.pow(1.025,(year-2022))  # assume 2.5% increase yearly after 2022
-	else:
-		return ret[year]
+	if year > 2022 and year < 2025:
+		ret[year] =  ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
+	elif year > 2024:
+		ret[year] = ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 2 years @ 2%, 3% increase yearly after 2024
+
+	if sp and (year > 2023 and year < 2028):
+		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350 spread over 4 years
+
+	return ret[year]
 
 def OtherSalaries(year):
 	ret = {
 		2021: 1047276,
 		2022: 1047276,
 	}
-	if year > 2022:
-		return ret[2022]*math.pow(1.025,(year-2022))  # assume 2.5% increase yearly after 2022
+	if year > 2022 and year < 2025:
+		return ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
+	elif year > 2024:
+		return ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
 	else:
 		return ret[year]
 
@@ -286,8 +294,10 @@ def DesignatedSalaries(year):
 		2021: 609405,
 		2022: 440563,
 	}
-	if year > 2022:
-		return ret[2022]*math.pow(1.025,(year-2022))  # assume 2.5% increase yearly after 2022
+	if year > 2022 and year < 2025:
+		return ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
+	elif year > 2024:
+		return ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
 	else:
 		return ret[year]
 
@@ -342,6 +352,20 @@ def ProgramFYCCOVID(year):
 		year = 0
 	else:	
 		return exp[year]
+
+def StrategicPlanInvest(year):
+	exp =  {
+		2021: 0,
+		2022: 0,
+		2023: 250000,
+		2024: 500000,
+		2025: 750000,
+		2026: 1000000,
+		2027: 1250000,
+		2028: 1500000,
+	}
+	return exp[year]
+	
 
 def GeneralOpsMaint(year):
 # numbers from MJ Strunk email 4/20/2022

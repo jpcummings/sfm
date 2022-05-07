@@ -282,7 +282,10 @@ def totalTuition(cc,type):
 #	print(type)
 	for c in cc:
 		if (type == 'all' or c.type() == type):
-			tot_tui+= c.tuition()
+			if c._name.startswith('TE'): # tuition exchange students pay no tuition
+				print ("found TE cohort")
+			else:
+				tot_tui+= c.tuition()
 	return tot_tui
 
 def totalFees(cc,type):
@@ -298,7 +301,11 @@ def totalAid(cc,type):
 	tot_stud_aid = 0
 	for c in cc:
 		if (type == 'all' or c.type() == type):
-			tot_stud_aid+= c.financialaid()
+			if c._name.startswith('TE'): # tuition exchange students pay no tuition, so they get no aid!
+				print ("found TE cohort")
+			else:
+			#	print(c._name, c._currentsemester, c.financialaid())
+				tot_stud_aid+= c.financialaid()
 	return tot_stud_aid
 
 def totalRoom(cc,type):
@@ -589,7 +596,7 @@ def closeExcel(oname):
 	book.save(oname)
 
 	
-def writeHeaderExcel(title):
+def writeHeaderExcel(title, sp=False):
 	global book
 	global sheet1
 	global currency
@@ -671,6 +678,8 @@ def writeHeaderExcel(title):
 	row+=1; sheet1.write(row, 0, "  COVID Related")
 	row+=1; sheet1.write(row, 0, "   Program Costs- Designated")
 	row+=1; sheet1.write(row, 0, "  Program- First Year Class/COVID Effects")
+	if sp:
+		row+=1; sheet1.write(row, 0, "Strategic Plan Investments")
 	row+=1; sheet1.write(row, 0, "      Total Administrative & Program Costs", style = bold)
 	row+=1; sheet1.write(row, 0, "Operation of Physical Plant")
 	row+=1; sheet1.write(row, 0, "General Operation & Maintenance of Plant")
@@ -684,7 +693,7 @@ def writeHeaderExcel(title):
 	row+=1; 
 	row+=1; sheet1.write(row, 0, "Contingency/Targeted Surplus(Deficit)", style = bold)
 
-def writeYearExcel(fall, spring, col = 1):
+def writeYearExcel(fall, spring, col = 1, sp=False):
 	global book
 	global sheet1
 	global currency
@@ -747,7 +756,7 @@ def writeYearExcel(fall, spring, col = 1):
 	row+=1; #sheet1.write(row, 0, "Operating Expenditures")
 	row+=1; #sheet1.write(row, 0, "Compensation")
 	row+=1; sheet1.write(row, col, totalFacultySalary(yr,"all"), currency); iFacSal = i2e(row,col)
-	row+=1; sheet1.write(row, col, er.StaffAdminSalaries(year), currency)
+	row+=1; sheet1.write(row, col, er.StaffAdminSalaries(year,sp), currency)
 	row+=1; sheet1.write(row, col, er.OtherSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.DesignatedSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.FYCCOVIDSalaries(year), currency)
@@ -760,8 +769,10 @@ def writeYearExcel(fall, spring, col = 1):
 	row+=1; sheet1.write(row, col, er.GeneralCollegeOperations(year), currency); iGenOps = i2e(row,col)
 	row+=1; sheet1.write(row, col, er.COVIDRelated(year), currency)
 	row+=1; sheet1.write(row, col, er.ProgramCostsDesignated(year), currency)
-	row+=1; sheet1.write(row, col, er.ProgramFYCCOVID(year), currency); iFYCCOVID = i2e(row,col)
-	row+=1; sheet1.write(row, col, xlwt.Formula('SUM({}:{})'.format(iGenOps,iFYCCOVID)), currency ); iTotAdmin  = i2e(row,col)
+	row+=1; sheet1.write(row, col, er.ProgramFYCCOVID(year), currency); iEndAdmProg = i2e(row,col)
+	if sp:
+		row+=1; sheet1.write(row, col, er.StrategicPlanInvest(year), currency); iEndAdmProg = i2e(row,col)
+	row+=1; sheet1.write(row, col, xlwt.Formula('SUM({}:{})'.format(iGenOps,iEndAdmProg)), currency ); iTotAdmin  = i2e(row,col)
 	row+=1; # sheet1.write(row, 0, "Operation of Physical Plant")
 	row+=1; sheet1.write(row, col, er.GeneralOpsMaint(year), currency); iGenOpsMaint = i2e(row,col)
 	row+=1; sheet1.write(row, col, er.Utilities(year), currency)
@@ -837,11 +848,12 @@ def main(argv):
 	facinputfile = 'input/fac_dat_Schools_true_rel.xlsx'
 	excel_flag = False
 	sep = "\t"
-	simyear = 202230
+	simyear = 202230   # startyear for simulation
+	stratplan = False  # include Strategic Plan investments
 
 
 	try:
-		opts, args = getopt.getopt(argv,"hxcF:i:o:y:b:",["ifile=","ofile="])
+		opts, args = getopt.getopt(argv,"hxscF:i:o:y:b:",["ifile=","ofile="])
 	except getopt.GetoptError:
 		print ('sfm.py -h -x -c -F <osep> -i <inputfile> -o <outputfile> -y <YYYYSS> -b <basename>')
 		sys.exit(2)
@@ -851,6 +863,8 @@ def main(argv):
 			sys.exit()
 		elif opt in ("-x"):
 			excel_flag = True
+		elif opt in ("-s"):
+			stratplan = True
 		elif opt in ("-c"):
 			print_cohorts = True
 		elif opt in ("-F"):
@@ -860,7 +874,7 @@ def main(argv):
 		elif opt in ("-o", "--ofile"):
 			outputfile = arg
 		elif opt in ("-y"):
-			simyear = int(arg)
+			simyear = int(arg)   # startyear for simulation
 		elif opt in ("-b"):
 			basename = arg
 			inputfile = 'input/{}-in.csv'.format(basename)
@@ -877,6 +891,7 @@ def main(argv):
 
 	facdfs = {}
 	facdfs["ug"] = facultydf
+	facdfs["TE"] = facultydf
 	facdfs["MBA"] = facultydf
 	facdfs["MSA"] = facultydf
 	facdfs["grad"] = facultydf
@@ -903,8 +918,8 @@ def main(argv):
 	springs.append(spring)
 	falls.append(fall)
 	yrs.append(year)
-	writeHeaderExcel(basename)
-	writeYearExcel(fall,spring,1)
+	writeHeaderExcel(basename,stratplan)
+	writeYearExcel(fall,spring,1,stratplan)
 
 	# test print of sections needed
 	# print("Total sections needed for Fall: {0:8.2f}".format(totalSections(fall,'all')))
@@ -937,7 +952,7 @@ def main(argv):
 		# print("Total sections needed for Fall: {0:8.2f}".format(totalSections(nextfall,'all')))
 		# print("Total sections needed for Spring: {0:8.2f}".format(totalSections(nextspring,'all')))
 		# print("")
-		writeYearExcel(nextfall,nextspring,yr+2)
+		writeYearExcel(nextfall,nextspring,yr+2,stratplan)
 		nextyear = nextfall + nextspring
 		if print_cohorts == True :
 			print("Year %d" % (2+yr))
