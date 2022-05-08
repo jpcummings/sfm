@@ -25,6 +25,7 @@ import math
 
 
 def getTuition(year, type):
+	# all tuitions are per semester
 	UGTuition = {
 			2017:17305,	# 17305.5
 			2018:17728,	# 17876.5
@@ -64,6 +65,16 @@ def getTuition(year, type):
 			2023: 10800,	# 
 			2024: 10800	# 
 	}
+	CertificateTuition = {
+			2017: 0,	# 0
+			2018: 0,	# 0
+			2019: 0,	# 0
+			2020: 5400,	# 900/cr  (6 cr/sem for 2 sem?)
+			2021: 5400,	# 900/cr
+			2022: 5400,	# (assume no increases)
+			2023: 5400,	# 
+			2024: 5400	# 
+	}
 
 	tuition = UGTuition
 	if type == "grad" :
@@ -72,6 +83,8 @@ def getTuition(year, type):
 		tuition = MSATuition
 	elif type == "MBA":
 		tuition = MBATuition
+	elif type == "cert":
+		tuition = CertificateTuition
 
 	if type == "TE": # we get no tuition revenue from tuition exchange students
 		return 0
@@ -273,7 +286,7 @@ def StaffAdminSalaries(year, sp=False):
 		ret[year] = ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 2 years @ 2%, 3% increase yearly after 2024
 
 	if sp and (year > 2023 and year < 2028):
-		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350 spread over 4 years
+		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
 
 	return ret[year]
 

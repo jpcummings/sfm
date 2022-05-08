@@ -40,7 +40,10 @@ class Cohort:
 
 		# base salaries from 2020.  Assume 2.5% raises
 		if self._type == 'grad':
-			self._facultymix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.333, 0.333, 0.333, 0, 0, 0, 0, 0, 0]
+#			print("found grad cohort ",self._name)
+			if '-H' in self._name:
+#				print("and it's high cost")
+				self._facultymix = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.333, 0.333, 0.333, 0, 0, 0, 0, 0, 0]
 #			print(self._facultymix)
 #			print(self._facultysalary)
 #			print(self._facultymix*self._facultysalary)
@@ -618,6 +621,7 @@ def writeHeaderExcel(title, sp=False):
 	row+=1;sheet1.write(row, 0, "Average MSA student Enrollment")
 	row+=1;sheet1.write(row, 0, "Average MBA student Enrollment")
 	row+=1;sheet1.write(row, 0, "Average Grad student Enrollment")
+	row+=1;sheet1.write(row, 0, "Average Certificate student Enrollment")
 	row+=1;sheet1.write(row, 0, "Average Master Programs Credit Hours")
 	row+=1;sheet1.write(row, 0, "Total Enrollment")
 	row+=1;sheet1.write(row, 0, "Resident Students Demand")
@@ -637,6 +641,7 @@ def writeHeaderExcel(title, sp=False):
 	row+=1; sheet1.write(row, 0, "  MBA Program")
 	row+=1; sheet1.write(row, 0, "       Masters Program Financial Aid")
 	row+=1; sheet1.write(row, 0, "  Grad Program tuition")
+	row+=1; sheet1.write(row, 0, "  Certificate Program tuition")
 	row+=1; sheet1.write(row, 0, "  Foreign Study Abroad-Net")
 	row+=1; sheet1.write(row, 0, "      Total Tuition", style = bold)
 	row+=1; sheet1.write(row, 0, "Fees")
@@ -712,6 +717,7 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"MSA"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"MBA"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"grad"))/2, integer )
+	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"cert"))/2, integer )
 	row+=1
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"ug")+totalNumStudents(yr,"MSA")+totalNumStudents(yr,"MBA")+totalNumStudents(yr,"grad"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumResidents(fall,"ug",9999)+totalNumResidents(spring,"ug",9999))/2, integer )
@@ -729,8 +735,9 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, totalTuition(yr,"MBA"), currency); iMBA = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalAid(yr,"MBA"), currency); iMBAAid = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalTuition(yr,"grad"), currency); iGrad = i2e(row,col)
+	row+=1; sheet1.write(row, col, totalTuition(yr,"cert"), currency); iCert = i2e(row,col)
 	row+=1; sheet1.write(row, col, er.StudyAbroadNet(year), currency); iAbroad = i2e(row,col)
-	row+=1; sheet1.write(row, col, xlwt.Formula('{}+{}+{}+{}+{}-{}+{}+{}'.format(iTotUGTuition,iPTandSumm,iPTNurs,iMSA,iMBA,iMBAAid,iGrad,iAbroad)), currency); iTotTuition = i2e(row,col)
+	row+=1; sheet1.write(row, col, xlwt.Formula('{}+{}+{}+{}+{}-{}+{}+{}+{}'.format(iTotUGTuition,iPTandSumm,iPTNurs,iMSA,iMBA,iMBAAid,iGrad,iCert,iAbroad)), currency); iTotTuition = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalFees(yr,"all"), currency); iFees = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalRoom(yr,"all"), currency); iRoom = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalBoard(yr,"all"), currency); iBoard = i2e(row,col)
@@ -895,6 +902,7 @@ def main(argv):
 	facdfs["MBA"] = facultydf
 	facdfs["MSA"] = facultydf
 	facdfs["grad"] = facultydf
+	facdfs["cert"] = facultydf
 
 # read the student cohorts
 	if excel_flag:
