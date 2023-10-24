@@ -1,0 +1,17 @@
+Model000i
+Steady state model
+./sfm.py -b Model000i
+
+Model010
+Strategic Plan Model includes:
+strategic plan spending $250k/yr incremental
+staff and admin compensation adjustments $350k/yr for 4 years
+4 new UG progs
+3 new Grad progs
+2 new advanced certificates
+	costs include fac. salaries and marketing
+DR reduces 1%/yr
+4% dip in retention recovers 1%/yr
+./sfm.py -s -b Model010
+
+./sfm.py -s -b Model009d
