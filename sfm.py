@@ -131,7 +131,7 @@ class Cohort:
 		sections_per_student = self._sections_per_student
 		sections_per_fte = self._sections_per_fte
 		f = self._facultymix
-		c = self._facultysalary/2.0  # assume 1/2 year
+		c = self._facultysalary/2.0   # assume 1/2 year
 		f_fte = self._facultyfte
 		N_s = self._numstudents
 		Nbar = self._meansecsize
@@ -256,6 +256,7 @@ def correctResidentFrac(sem,nresidmax):
 			c._oldres = c._fracresidential 
 			c._fracresidential = correction*c._fracresidential 
 
+
 	return correction
 	
 
@@ -286,7 +287,8 @@ def totalTuition(cc,type):
 	for c in cc:
 		if (type == 'all' or c.type() == type):
 			if c._name.startswith('TE'): # tuition exchange students pay no tuition
-				print ("found TE cohort")
+#				print ("found TE cohort")
+				tot_tui+= 0.0
 			else:
 				tot_tui+= c.tuition()
 	return tot_tui
@@ -305,7 +307,8 @@ def totalAid(cc,type):
 	for c in cc:
 		if (type == 'all' or c.type() == type):
 			if c._name.startswith('TE'): # tuition exchange students pay no tuition, so they get no aid!
-				print ("found TE cohort")
+#				print ("found TE cohort")
+				tot_stud_aid+= 0.0
 			else:
 			#	print(c._name, c._currentsemester, c.financialaid())
 				tot_stud_aid+= c.financialaid()
@@ -334,6 +337,18 @@ def totalNumStudents(cc,type):
 		if (type == 'all' or c.type() == type):
 			tot_nstud+= c.nstud()
 	return tot_nstud
+
+def totalNumPayingStudents(cc,type):
+	# calculates paying students for a year assuming 60 TE students total 
+	# and 142 (71 each semester) study abroad
+	# loop over cohorts and add students
+	n_TE = 60*2 # this function gives the sum of both semesters, so TE students are counted twice.
+	n_StudyAbroad = 142 # this number (142) already is the sum of both semesters.
+	tot_nstud = 0
+	for c in cc:
+		if (type == 'all' or c.type() == type):
+			tot_nstud+= c.nstud()
+	return tot_nstud-n_TE-n_StudyAbroad
 
 def totalNumResidents(cc,type,nresidmax):
 	# loop over cohorts and add residents
@@ -614,8 +629,8 @@ def writeHeaderExcel(title, sp=False):
 	sheet1.write(0, 0, title, style = bold)
 
 	row = 1
-	row+=1;sheet1.write(row, 0, "Fall Full Time Undergraduate Paying Enrollment")
-	row+=1;sheet1.write(row, 0, "Spring Full Time Undergraduate Paying Enrollment")
+	row+=1;sheet1.write(row, 0, "Fall Full Time Undergraduate Enrollment")
+	row+=1;sheet1.write(row, 0, "Spring Full Time Undergraduate Enrollment")
 	row+=1;sheet1.write(row, 0, "Average Full Time Undergraduate Paying Enrollment")
 	row+=1;sheet1.write(row, 0, "FT Tuition & Mandatory Fees - Undergraduate Students")
 	row+=1;sheet1.write(row, 0, "Average MSA student Enrollment")
@@ -712,7 +727,7 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row = 1
 	row+=1; sheet1.write(row, col, totalNumStudents(fall,"ug"), integer )
 	row+=1; sheet1.write(row, col, totalNumStudents(spring,"ug"), integer )
-	row+=1; sheet1.write(row, col, totalNumStudents(yr,"ug")/2, integer )
+	row+=1; sheet1.write(row, col, totalNumPayingStudents(yr,"ug")/2, integer )
 	row+=1; sheet1.write(row, col, er.getTuition(year, "ug")*2, currency)
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"MSA"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"MBA"))/2, integer )
@@ -767,9 +782,9 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, er.OtherSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.DesignatedSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.FYCCOVIDSalaries(year), currency)
-	row+=1; sheet1.write(row, col, 0.4*totalFacultySalary(yr,"all"), currency)
-	row+=1; sheet1.write(row, col, 0.4*er.StaffAdminSalaries(year), currency)
-	row+=1; iDesigFringe = i2e(row,col); # sheet1.write(row, col, 0.4*er.DesignatedSalaries(year), currency)
+	row+=1; sheet1.write(row, col, 0.361*totalFacultySalary(yr,"all"), currency)
+	row+=1; sheet1.write(row, col, 0.361*er.StaffAdminSalaries(year), currency)
+	row+=1; sheet1.write(row, col, 0.1088*er.DesignatedSalaries(year), currency); iDesigFringe = i2e(row,col)
 	row+=1; sheet1.write(row, col, xlwt.Formula('SUM({}:{})'.format(iFacSal,iDesigFringe)), currency ); iTotComp = i2e(row,col)
 	
 	row+=1
@@ -889,7 +904,7 @@ def main(argv):
 
 # read faculty data for expenses
 	facultydf = pd.read_excel(facinputfile)
-	# facultydf = facultydf.iloc[:,1:] # GLB first column contains description, not numbers; was failing when calculating benefits
+	facultydf = facultydf.iloc[:,1:] # GLB first column contains description, not numbers; was failing when calculating benefits
 	# Georges fix seems to have broken the ther calcs... all the vectors were missing the first element(!?)  fractions, salaries, ftes, etc
 
 	f_fte = get_f_fte(facultydf)
@@ -948,8 +963,8 @@ def main(argv):
 #
 ## do the next years
 #
-
-	for yr in range(5):
+	nyears = 4
+	for yr in range(nyears):
 		nextfall = []
 		nextspring = []
 		nextfall = gen_nextfall(spring,df, facdfs)

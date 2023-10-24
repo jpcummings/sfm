@@ -1,3 +1,17 @@
+==> Fri 05 May 2023 08:54:11 AM EDT
+
+Update with actual numbers from spring 2023.   Copy Model011 Model012 as starting point.  Don't forget "-s" to include strategic plan spending.
+
+Note: last year PT and summer was flat at 2249697, except we bumped up 2022-2023 to budget value of 2664010, but we kept future years at 2249697.  Now I've changed it to the Feb 23 projection of 3419873.  Probably should make a better estimate of future years(?)
+And similar question about Net Release of Temp. Restricted Funds.
+
+==> Thu 04 May 2023 10:31:45 AM EDT
+Model011 was final model used in fall 2022 as pro forma.
+Model011 has some tweaks from 010... look at inputs and try to figure out what it was
+
+Todo: Update model descriptions from [https://docs.google.com/document/d/18b5j9Ih_4pg3wE5-Ip_1WCBHfXejHRd3AxpaxcgkT8Q/edit?usp=sharing]
+
+
 Model006-in.csv
 	"Add Grads"
 	Based on Model000c baseline

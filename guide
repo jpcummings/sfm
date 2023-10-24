@@ -1,4 +1,5 @@
-./sfm.py -b Model002
+./sfm.py -s -b Model013
+./sfm.py -y 202330 -s -b Model015
 Rscript lots.r
 ./sfm.py -c -i input/testinput.csv 202130 > t.out
 https://docs.google.com/spreadsheets/d/1mqTrsNxDCLDhUXovgpnIAW5s5nSq6q1ov3pZDP3BvYc/edit?usp=sharing

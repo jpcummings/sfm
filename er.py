@@ -33,7 +33,7 @@ def getTuition(year, type):
 			2020: 19027.5,	# 19177.5
 			2021: 19600,	# 19748.5
 			2022: 19962.5,	# 20336.5
-			2023: 20561,	# 3% increase
+			2023: 20472.5,	# 2.6% increase	
 			2024: 21178	# 3% increase
 	}
 	GradTuition = {
@@ -95,8 +95,8 @@ def getTuition(year, type):
 		else:
 			return tuition[year]
 	else:
-		if year > 2022:
-			return tuition[2022]*math.pow(1.03,(year-2022))  # assume 3% increase yearly after 2022
+		if year > 2023:
+			return tuition[2023]*math.pow(1.03,(year-2023))  # assume 3% increase yearly after 2023
 		else:
 			return tuition[year]
 
@@ -112,9 +112,11 @@ def endowedScholarships(year):
 		2020: 3153250,
 		2021: 3153250,
 		2022: 3153250,
+		2023: 3483500,
+		2024: 3791009,
 	}
-	if year > 2022:
-		return scholarship[2022]  # assume no increase yearly after 2022
+	if year > 2024:
+		return scholarship[2024]  # assume no increase yearly after 2022
 	else:
 		return(scholarship[year])
 
@@ -125,9 +127,10 @@ def PTandSummer(year):
 		2020: 2249697,
 		2021: 2249697,
 		2022: 2249697,
+		2023: 3419873,    # change to 2022-23 projected -Feb 2023 val
 	}
-	if year > 2022:
-		return ptandsummer[2022]  # assume no increase yearly after 2022
+	if year > 2023:
+		return ptandsummer[2023]  # assume no increase yearly after 2022
 	else:
 		return(ptandsummer[year])
 
@@ -162,18 +165,22 @@ def BundyAid(year):
 	aid = {
 		2021: 230000,
 		2022: 205000,
+		2023: 225000,
+		2024: 223000,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return aid[year]
 
 def ResearchGrants(year):
 	grants = {
 		2021: 759887,
 		2022: 536326,
+		2023: 763829,
+		2024: 809342,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return grants[year]
 
 def COVIDDiscretionary(year):
@@ -191,18 +198,22 @@ def AnnualFund(year):
 	fund = {
 		2021: 1725000,
 		2022: 1625000, # adopted budget: 1760000, use projected (Apr 2022)
+		2023: 1625000, # adopted budget: 1760000, use projected (Apr 2022)
+		2024: 1825000, # use MJs # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return fund[year]
 
 def GiftsGrantsDesignated(year):
 	fund = {
 		2021: 1854116,
 		2022: 1712213,
+		2023: 1940575,
+		2024: 1985477,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return fund[year]
 
 def GiftsGrantsOther(year):
@@ -214,7 +225,7 @@ def InvestmentReturns(year):
 		2021: 2408057,
 		2022: 2229765,
 		2023: 2378168,
-		2024: 2600810,
+		2024: 2563343, # use MJs # from Jason R. email 20230522
 		2025: 2858366,
 		2026: 2938306,
 		2027: 3013365,
@@ -229,7 +240,7 @@ def EndowedGifts(year):
 		2021: 4392234,
 		2022: 4533300,
 		2023: 5175471,
-		2024: 5723241,
+		2024: 5552809, # use MJs # from Jason R. email 20230522
 		2025: 6283970,
 		2026: 6466648,
 		2027: 6632935,
@@ -242,36 +253,44 @@ def OtherResources(year):
 	ret = {
 		2021: 2038385,
 		2022: 1707717,
+		2023: 1777212,
+		2024: 2003147,
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return ret[year]
 
 def AthleticRevenue(year):
 	ret = {
 		2021: 0,
 		2022: 1068954,  # adopted budget:1185954, use projected (Apr 2022)
+		2023: 1876180,  # proposed budget
+		2024: 1708163,  # proposed budget
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return ret[year]
 
 def SCRI(year):
 	ret = {
 		2021: 0,
 		2022: 1050000,
+		2023: 521667,
+		2024: 1520000,  # use MJs # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return ret[year]
 
 def ReleaseTempRestrictedAssets(year):
 	ret = {
 		2021: 950000,
 		2022: 200000,
+		2023: 735000,
+		2024: 742500,  # use MJs # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return ret[year]
 
 
@@ -279,14 +298,29 @@ def StaffAdminSalaries(year, sp=False):
 	ret = {
 		2021: 23724100,
 		2022: 26326046,
+#		2023: 26789752,  # budget number
+		2023: 27112946,  # feb 23 projection number
+		2024: 28158478,  # use MJs # from Jason R. email 20230522 ($28508478 decreased by sp increase $350000, added in below)
 	}
-	if year > 2022 and year < 2025:
-		ret[year] =  ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
-	elif year > 2024:
-		ret[year] = ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 2 years @ 2%, 3% increase yearly after 2024
+##	if year > 2023 and year < 2025:
+##		ret[year] =  ret[2023]*math.pow(1.02,(year-2023))  # assume 2% increase yearly after 2022
+##	elif year > 2024:
+##		ret[year] = ret[2023]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 2 years @ 2%, 3% increase yearly after 2024
+#	if year > 2024:
+#		ret[year] = ret[2024]*math.pow(1.02,1)*math.pow(1.03,(year-2025))  # assume 1 years @ 2%, 3% increase yearly after 2025
+#
+#	if sp and (year > 2023 and year < 2028):
+#		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
 
-	if sp and (year > 2023 and year < 2028):
-		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
+	if sp:
+		if (year > 2023 and year < 2028):
+			ret[year] = ret[2024]+350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
+		elif year >= 2027:
+			ret[year] = (ret[2024]+1400000)*math.pow(1.03,(year-2027))
+	else:
+		if year > 2024:
+			ret[year] = ret[2024]*math.pow(1.02,1)*math.pow(1.03,(year-2025))  # assume 1 years @ 2%, 3% increase yearly after 2025
+		
 
 	return ret[year]
 
@@ -294,11 +328,12 @@ def OtherSalaries(year):
 	ret = {
 		2021: 1047276,
 		2022: 1047276,
+		2023: 1073876,
 	}
-	if year > 2022 and year < 2025:
-		return ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
+	if year > 2023 and year < 2025:
+		return ret[2023]*math.pow(1.02,(year-2023))  # assume 2% increase yearly after 2023
 	elif year > 2024:
-		return ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
+		return ret[2023]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
 	else:
 		return ret[year]
 
@@ -306,11 +341,15 @@ def DesignatedSalaries(year):
 	ret = {
 		2021: 609405,
 		2022: 440563,
+		2023: 515455,
+		2024: 639977,
 	}
-	if year > 2022 and year < 2025:
-		return ret[2022]*math.pow(1.02,(year-2022))  # assume 2% increase yearly after 2022
-	elif year > 2024:
-		return ret[2022]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
+#	if year > 2023 and year < 2025:
+#		return ret[2023]*math.pow(1.02,(year-2023))  # assume 2% increase yearly after 2023
+#	elif year > 2024:
+#		return ret[2023]*math.pow(1.02,2)*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
+	if year > 2024:
+		return ret[2024]*math.pow(1.02,(year-2024))  # assume 2% increase yearly after 2023
 	else:
 		return ret[year]
 
@@ -318,8 +357,9 @@ def FYCCOVIDSalaries(year):
 	sal = {
 		2021: 0,
 		2022: 461000,
+		2023: 102960,
 	}
-	if year > 2022:
+	if year > 2023:
 		return 0
 	else:
 		return sal[year]
@@ -328,9 +368,12 @@ def GeneralCollegeOperations(year):
 	ret = {
 		2021: 13797943,
 		2022: 14511218, # adopted budget: 14508067, use projected (Apr 2022)
+#		2023: 15023166, # proposed budget
+		2023: 15070104, # projected feb 2023
+		2024: 14849754, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2022:
-		return ret[2022]*math.pow(1.015,(year-2022))  # assume 1.5% increase yearly after 2022
+	if year > 2024:
+		return ret[2024]*math.pow(1.015,(year-2024))  # assume 1.5% increase yearly after 2022
 	else:
 		return ret[year]
 
@@ -348,9 +391,11 @@ def ProgramCostsDesignated(year):
 	exp = {
 		2021: 2876184,
 		2022: 3141087,
+		2023: 3721919,
+		2024: 3845642, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return exp[year]
 
 def ProgramFYCCOVID(year):
@@ -361,7 +406,7 @@ def ProgramFYCCOVID(year):
 		2024: 21500,
 		2025: 21500,
 	}
-	if year > 2025:
+	if year > 2022:  # i thought this continued 'til 2025 when the big class left(?) 
 		year = 0
 	else:	
 		return exp[year]
@@ -370,12 +415,13 @@ def StrategicPlanInvest(year):
 	exp =  {
 		2021: 0,
 		2022: 0,
-		2023: 250000,
-		2024: 500000,
-		2025: 750000,
-		2026: 1000000,
-		2027: 1250000,
-		2028: 1500000,
+		2023: 0,
+		2024: 250000,
+		2025: 500000,
+		2026: 750000,
+		2027: 1000000,
+		2028: 1250000,
+		2029: 1500000,
 	}
 	return exp[year]
 	
@@ -387,8 +433,9 @@ def GeneralOpsMaint(year):
 	exp = {
 		2021: 1988899,
 		2022: 2138899,
-		2023: 2203066,
-		2024: 2269158,
+		2023: 2202976, # MJ initallygave 2203066, is from 2202976 from proposed budget
+#		2024: 2269158, 
+		2024: 2182492, # use MJs budget # from Jason R. email 20230522
 		2025: 2687233, # 2337233+280000+70000
 		2026: 2767850,
 		2027: 2850885,
@@ -404,8 +451,10 @@ def Utilities(year):
 	exp = {
 		2021: 1950000,
 		2022: 1950000,
-		2023: 2250000, # +300000 or 15%
-		2024: 2400000, # +150000 or 6%
+#		2023: 2250000, # +300000 or 15%
+		2023: 2200000, # +300000 or 15% - changed from 2250000 to 2200000 to match MJs #'s 20230508
+#		2024: 2400000, # +150000 or 6%
+		2024: 2200000, # use MJs budget # from Jason R. email 20230522
 		2025: 2500000, # +100000 or 4%
 	}
 	if year > 2024:
@@ -417,9 +466,11 @@ def DeferredMaint(year):
 	exp = {
 		2021: 500000,
 		2022: 500000,
+		2023: 500000,
+		2024: 450000, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return exp[year]
 
 def Food(year):
@@ -427,10 +478,13 @@ def Food(year):
 	ret = {
 		2021: 6582271,
 		2022: 8954319, # use projected (4/21/2022), the budget number was 8234610,
-		2023: 9361625,
+#		2023: 9361625,
+#		2023: 8961558, # proposed budget number
+		2023: 8935537, # projected feb 2023 number
+		2024: 9424235, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2022:
-		return ret[2023]*math.pow(1.035,(year-2023))  # assume 4.5% increase yearly after 2023
+	if year > 2024:
+		return ret[2024]*math.pow(1.035,(year-2024))  # assume 4.5% increase yearly after 2023
 	else:
 		return ret[year]
 
@@ -438,19 +492,22 @@ def InterestExpense(year):
 	exp = {
 		2021: 862271,
 		2022: 786159,
+		2023: 707338,
+		2024: 626401, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2022:
-		year = 2022
+	if year > 2024:
+		year = 2024
 	return exp[year]
 
 def AssetRetirementObligation(year):
 	exp = {
 		2021: 125069,
 		2022: 129973,
-		2023: 135072,
+		2023: 95073, # projection feb 2023
+		2024: 139490, # use MJs budget # from Jason R. email 20230522
 	}
-	if year > 2023:
-		year = 2023
+	if year > 2024:
+		year = 2024
 	return exp[year]
 
 def Depreciation(year):
@@ -459,10 +516,13 @@ def Depreciation(year):
 		2021: 8089582,
 		2022: 7891233,
 		2023: 8460459,
-		2024: 8831738,
+#		2024: 8831738,
+		2024: 8571537, # use MJs budget # from Jason R. email 20230522
 		2025: 10904758,
 		2026: 12760341,
 		2027: 12056872,
 	}
+	if year > 2027:
+		year = 2024
 	return ret[year]
 
