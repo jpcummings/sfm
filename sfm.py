@@ -73,10 +73,14 @@ class Cohort:
 		return self._fracresidential*self._numstudents
 
 	def tuition(self):
-		return self._numstudents*(self._tuition)
+#		print('nstud: {:d}, tui: {:.2f}, ret: {:.2f}'.format(int(self._numstudents), self._tuition, int(self._numstudents)*(self._tuition)) )
+		return int(self._numstudents)*(self._tuition)
 
 	def fees(self):
-		return self._numstudents*(self._fees)
+		prog_support = 0.0  # Program and Support fee, mandatory in 2023-24 and after
+		if self.year() > 2023:
+			prog_support = 375.0
+		return self._numstudents*(self._fees+prog_support)
 
 	def financialaid(self):
 		return self._numstudents*self._aid
@@ -283,7 +287,7 @@ def totalSections(cc,type):
 def totalTuition(cc,type):
 	# loop over cohorts and add tuition and fees
 	tot_tui = 0
-#	print(type)
+	print("Tuition type: %s" % (type) )
 	for c in cc:
 		if (type == 'all' or c.type() == type):
 			if c._name.startswith('TE'): # tuition exchange students pay no tuition
@@ -291,7 +295,22 @@ def totalTuition(cc,type):
 				tot_tui+= 0.0
 			else:
 				tot_tui+= c.tuition()
+			print("Year: %d/%d, %s, nstud %d, tui: %.2f, tot_tui: %.2f" % (c.year(),c.semester(),c._name, c._numstudents, c.tuition(), tot_tui) )
 	return tot_tui
+
+def tuitionCorrStudAbroad(cc,type, nSAstud):
+	year = 0
+	for c in cc:
+		if (type == 'all' or c.type() == type):
+			yr = c.year()
+			if yr != year:
+				if year == 0:
+					year = yr
+				else:
+					print("Error! year changed in cohort")
+					sys.exit()
+					
+	return nSAstud*2*er.getTuition(year, "ug")
 
 def totalFees(cc,type):
 	# loop over cohorts and add tuition and fees
@@ -313,6 +332,9 @@ def totalAid(cc,type):
 			#	print(c._name, c._currentsemester, c.financialaid())
 				tot_stud_aid+= c.financialaid()
 	return tot_stud_aid
+
+def aidCorrStudAbroad(cc,type, nSAstud):
+	return nSAstud*totalAid(cc,type)/totalNumPayingStudents(cc,type)
 
 def totalRoom(cc,type):
 	# loop over cohorts and add room and board
@@ -353,11 +375,23 @@ def totalNumPayingStudents(cc,type):
 def totalNumResidents(cc,type,nresidmax):
 	# loop over cohorts and add residents
 	tot_nres = 0
-	correctResidentFrac(cc, nresidmax)
+	# correctResidentFrac(cc, nresidmax)
 	for c in cc:
 		if (type == 'all' or c.type() == type):
 			tot_nres+= c.nresid()
-	return tot_nres 
+	return tot_nres if tot_nres<nresidmax else nresidmax
+
+def totalNumResidentsDebug(cc,type,nresidmax):
+	# loop over cohorts and add residents
+	tot_nres = 0
+	tot_stud = 0
+	# correctResidentFrac(cc, nresidmax)
+	for c in cc:
+		if (type == 'all' or c.type() == type):
+			tot_nres+= c.nresid()
+			tot_stud+= c.nstud()
+			print("%s: nstud: %d res: %d totstud: %d totres %d" % (c._name, c.nstud(), c.nresid(), tot_stud, tot_nres) )
+	return tot_nres if tot_nres<nresidmax else nresidmax
 
 
 def totalNumResidentsOLD(cc,type):
@@ -737,10 +771,16 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, (totalNumStudents(yr,"ug")+totalNumStudents(yr,"MSA")+totalNumStudents(yr,"MBA")+totalNumStudents(yr,"grad"))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumResidents(fall,"ug",9999)+totalNumResidents(spring,"ug",9999))/2, integer )
 	row+=1; sheet1.write(row, col, (totalNumResidents(fall,"ug",2454)+totalNumResidents(spring,"ug",2454))/2, integer )
+	print("Fall")
+	totalNumResidentsDebug(fall,"ug",9999)
+	print("Spring")
+	totalNumResidentsDebug(spring,"ug",9999)
+	print("")
 
 	row+=5
-	row+=1; sheet1.write(row, col, totalTuition(yr,"ug"), currency); iTuition = i2e(row,col)
-	row+=1; sheet1.write(row, col, totalAid(yr,"ug"), currency); iAid = i2e(row,col)	
+	print("tuition: " + str(totalTuition(yr,"ug")) + " correction: " + str(tuitionCorrStudAbroad(yr,"ug", 75)) )
+	row+=1; sheet1.write(row, col, totalTuition(yr,"ug")-tuitionCorrStudAbroad(yr,"ug", 75), currency); iTuition = i2e(row,col)
+	row+=1; sheet1.write(row, col, totalAid(yr,"ug")-aidCorrStudAbroad(yr,"ug", 75), currency); iAid = i2e(row,col)	
 	row+=1; sheet1.write(row, col, er.endowedScholarships(year), currency); iEndowedScholarships = i2e(row,col) 
 	row+=1; sheet1.write(row, col, xlwt.Formula('{}-{}-{}'.format(iTuition,iAid,iEndowedScholarships)), currency ); iTotUGTuition = i2e(row,col)
 	
@@ -754,7 +794,8 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, er.StudyAbroadNet(year), currency); iAbroad = i2e(row,col)
 	row+=1; sheet1.write(row, col, xlwt.Formula('{}+{}+{}+{}+{}-{}+{}+{}+{}'.format(iTotUGTuition,iPTandSumm,iPTNurs,iMSA,iMBA,iMBAAid,iGrad,iCert,iAbroad)), currency); iTotTuition = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalFees(yr,"all"), currency); iFees = i2e(row,col)
-	row+=1; sheet1.write(row, col, totalRoom(yr,"all"), currency); iRoom = i2e(row,col)
+#	row+=1; sheet1.write(row, col, totalRoom(yr,"all"), currency); iRoom = i2e(row,col)
+	row+=1; sheet1.write(row, col, er.getAvgRoomRate(year)*(totalNumResidents(fall,"ug",2454)+totalNumResidents(spring,"ug",2454)), currency); iRoom = i2e(row,col)
 	row+=1; sheet1.write(row, col, totalBoard(yr,"all"), currency); iBoard = i2e(row,col)
 	row+=1; sheet1.write(row, col, xlwt.Formula('{}+{}+{}+{}'.format(iTotTuition,iFees,iRoom,iBoard)), currency); iNetStudRev = i2e(row,col)
 	row+=1
@@ -782,13 +823,13 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1; sheet1.write(row, col, er.OtherSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.DesignatedSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.FYCCOVIDSalaries(year), currency)
-	row+=1; sheet1.write(row, col, 0.361*totalFacultySalary(yr,"all"), currency)
-	row+=1; sheet1.write(row, col, 0.361*er.StaffAdminSalaries(year), currency)
-	row+=1; sheet1.write(row, col, 0.1088*er.DesignatedSalaries(year), currency); iDesigFringe = i2e(row,col)
+	row+=1; sheet1.write(row, col, 0.365*totalFacultySalary(yr,"all"), currency)
+	row+=1; sheet1.write(row, col, 0.365*er.StaffAdminSalaries(year), currency)
+	row+=1; sheet1.write(row, col, 0.123*er.DesignatedSalaries(year), currency); iDesigFringe = i2e(row,col)
 	row+=1; sheet1.write(row, col, xlwt.Formula('SUM({}:{})'.format(iFacSal,iDesigFringe)), currency ); iTotComp = i2e(row,col)
 	
 	row+=1
-	row+=1; sheet1.write(row, col, er.GeneralCollegeOperations(year), currency); iGenOps = i2e(row,col)
+	row+=1; sheet1.write(row, col, er.GeneralCollegeOperations(year)+er.MarketingNewProgs(year), currency); iGenOps = i2e(row,col)
 	row+=1; sheet1.write(row, col, er.COVIDRelated(year), currency)
 	row+=1; sheet1.write(row, col, er.ProgramCostsDesignated(year), currency)
 	row+=1; sheet1.write(row, col, er.ProgramFYCCOVID(year), currency); iEndAdmProg = i2e(row,col)
