@@ -32,9 +32,10 @@ def getTuition(year, type):
 			2019:18338,	# 18487.5
 			2020: 19027.5,	# 19177.5
 			2021: 19600,	# 19748.5
-			2022: 19962.5,	# 20336.5
-			2023: 20472.5,	# 2.6% increase	
-			2024: 21290	# 3% increase
+			2022: 19962.5,	# 39925/2 = 19962.5
+			2023: 20472.5,	# 40945/2 = 20472.5	
+			2024: 21290,	# 42580/2 = 21290
+			2025: 22252.5,  # 44505/2 = 22252.5
 	}
 	GradTuition = {
 			2017: 17163,	# 17305.5
@@ -44,7 +45,8 @@ def getTuition(year, type):
 			2021: 19692,	# 19748.5
 			2022: 20381,	# 20336.5
 			2023: 21094,	# 20946.5
-			2024: 21832	# 21597.0
+			2024: 21832,	# 21597.0
+			2025: 21832,	# 21597.0
 	}
 	MSATuition = {
 			2018: 10629,	# 1181/cr
@@ -53,7 +55,8 @@ def getTuition(year, type):
 			2021: 11754,	# 1306/cr
 			2022: 12106,	# (assume 3% increases)
 			2023: 12470,	#
-			2024: 13218	#
+			2024: 13218,	#
+			2025: 13218,	#
 	}
 	MBATuition = {
 			2017: 0,	# 0
@@ -63,7 +66,8 @@ def getTuition(year, type):
 			2021: 10800,	# 900/cr
 			2022: 10800,	# (assume no increases)
 			2023: 10800,	# 
-			2024: 10800	# 
+			2024: 10800,	# 
+			2025: 10800,	# 
 	}
 	CertificateTuition = {
 			2017: 0,	# 0
@@ -73,7 +77,8 @@ def getTuition(year, type):
 			2021: 5400,	# 900/cr
 			2022: 5400,	# (assume no increases)
 			2023: 5400,	# 
-			2024: 5400	# 
+			2024: 5400,	# 
+			2025: 5400,	# 
 	}
 
 	tuition = UGTuition
@@ -95,8 +100,8 @@ def getTuition(year, type):
 		else:
 			return tuition[year]
 	else:
-		if year > 2024:
-			return tuition[2024]*math.pow(1.03,(year-2024))  # assume 3% increase yearly after 2024
+		if year > 2025:
+			return tuition[2025]*math.pow(1.03,(year-2025))  # assume 3% increase yearly after 2025
 		else:
 			return tuition[year]
 
@@ -168,11 +173,12 @@ def StudyAbroadNet(year):
 		2018: 1000000,
 		2019: 1000000,
 		2020: 1000000,
-		2021: 1000000,
-		2022: 1000000,
+		2021: 14491,
+		2022: 565996,
+		2023: 1203449,
 	}
-	if year > 2022:
-		return studyabroadnet[2022]  # assume no increase yearly after 2022
+	if year > 2023:
+		return 1000000  # assume $1M placeholder
 	else:
 		return(studyabroadnet[year])
 
@@ -325,6 +331,17 @@ def ReleaseTempRestrictedAssets(year):
 		year = 2025
 	return ret[year]
 
+def totalFacultySalary(year, sp=False):
+	ret = {
+		2023: 22861374,  # actual
+		2024: 23960860,  # use MJs budget 2023-24
+		2025: 24440077,  # 2%
+		2026: 25173279,  # 3%
+		2027: 25928477,  # 3%
+		2028: 26706332,  # 3%
+	}
+
+	return ret[year]
 
 def StaffAdminSalaries(year, sp=False):
 	ret = {
@@ -403,7 +420,8 @@ def FYCCOVIDSalaries(year):
 	sal = {
 		2021: 0,
 		2022: 461000,
-		2023: 102960,
+#		2023: 102960, #budget and projection
+		2023: 0, # turned out to be zero!
 	}
 	if year > 2023:
 		return 0

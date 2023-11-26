@@ -78,8 +78,12 @@ class Cohort:
 
 	def fees(self):
 		prog_support = 0.0  # Program and Support fee, mandatory in 2023-24 and after
-		if self.year() > 2023:
+		# 2024 $750/yr = $375/sem
+		# 2025+ $1000/yr = $500/sem
+		if self.year() == 2024:
 			prog_support = 375.0
+		elif self.year() > 2024:
+			prog_support = 500.0
 		return self._numstudents*(self._fees+prog_support)
 
 	def financialaid(self):
@@ -429,13 +433,16 @@ def totalFacultyCost(cc,type="all"):
 			tot_faccost+= c.facultycost()
 	return tot_faccost
 
-def totalFacultySalary(cc,type="all"):
-	# loop over cohorts and add facultycost
-	tot_faccost = 0
-	for c in cc:
-		if (type == 'all' or c.type() == type):
-			tot_faccost+= c.facultysalary()
-	return tot_faccost
+# this function calculates salaries based on teaching demand and assumed mix.  we are now using 2022-23 values and 
+# giving raises; see er.py for code
+#
+#def totalFacultySalary(cc,type="all"):
+#	# loop over cohorts and add facultycost
+#	tot_faccost = 0
+#	for c in cc:
+#		if (type == 'all' or c.type() == type):
+#			tot_faccost+= c.facultysalary()
+#	return tot_faccost
 
 def setfacdfs(cc, facdfs):
 	for c in cc:
@@ -818,12 +825,12 @@ def writeYearExcel(fall, spring, col = 1, sp=False):
 	row+=1
 	row+=1; #sheet1.write(row, 0, "Operating Expenditures")
 	row+=1; #sheet1.write(row, 0, "Compensation")
-	row+=1; sheet1.write(row, col, totalFacultySalary(yr,"all"), currency); iFacSal = i2e(row,col)
+	row+=1; sheet1.write(row, col, er.totalFacultySalary(year,sp), currency); iFacSal = i2e(row,col)
 	row+=1; sheet1.write(row, col, er.StaffAdminSalaries(year,sp), currency)
 	row+=1; sheet1.write(row, col, er.OtherSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.DesignatedSalaries(year), currency)
 	row+=1; sheet1.write(row, col, er.FYCCOVIDSalaries(year), currency)
-	row+=1; sheet1.write(row, col, 0.365*totalFacultySalary(yr,"all"), currency)
+	row+=1; sheet1.write(row, col, 0.365*er.totalFacultySalary(year,sp), currency)
 	row+=1; sheet1.write(row, col, 0.365*er.StaffAdminSalaries(year), currency)
 	row+=1; sheet1.write(row, col, 0.123*er.DesignatedSalaries(year), currency); iDesigFringe = i2e(row,col)
 	row+=1; sheet1.write(row, col, xlwt.Formula('SUM({}:{})'.format(iFacSal,iDesigFringe)), currency ); iTotComp = i2e(row,col)
