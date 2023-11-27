@@ -23,6 +23,14 @@ import math
 # 2021: 900
 # 2022: 900
 
+newFacCost = {
+	2023: 0,
+	2024: 206421,
+	2025: 315824+105275+17380+131844,
+	2026: 421098+107380+214760+107380+134481+107381+107381,
+	2027: 429520+109528+219528+109528+137170+219056+219056,
+	2028: 0,
+}
 
 def getTuition(year, type):
 	# all tuitions are per semester
@@ -335,13 +343,13 @@ def totalFacultySalary(year, sp=False):
 	ret = {
 		2023: 22861374,  # actual
 		2024: 23960860,  # use MJs budget 2023-24
-		2025: 24440077,  # 2%
-		2026: 25173279,  # 3%
-		2027: 25928477,  # 3%
-		2028: 26706332,  # 3%
+		2025: 24559012,  # 2% + 118935 (union increase)
+		2026: 25295782,  # 3% 
+		2027: 26054655,  # 3%
+		2028: 26836295,  # 3%
 	}
 
-	return ret[year]
+	return ret[year]+newFacCost[year]
 
 def StaffAdminSalaries(year, sp=False):
 	ret = {
@@ -349,7 +357,11 @@ def StaffAdminSalaries(year, sp=False):
 		2022: 25906658,
 #		2023: 26789752,  # budget number
 		2023: 27464527,  # actual
-		2024: 28158478,  # use MJs # from Jason R. email 20230522 ($28508478 decreased by sp increase $350000, added in below)
+		2024: 28508478,  # use MJs budget (11/6/23) # from Jason R. email 20230522 ($28508478 decreased by sp increase $350000, added in below)
+		2025: 29492494,  # = (28158478)*1.03 + 350000(comparability) + 139262(FSLA)
+		2026: 30727268,  # = (29492494)*1.03 + 350000
+		2027: 31999086,  # = (30727268)*1.03 + 350000
+		2028: 33309058,  # = (31999086)*1.03 + 350000
 	}
 ##	if year > 2023 and year < 2025:
 ##		ret[year] =  ret[2023]*math.pow(1.02,(year-2023))  # assume 2% increase yearly after 2022
@@ -361,14 +373,14 @@ def StaffAdminSalaries(year, sp=False):
 #	if sp and (year > 2023 and year < 2028):
 #		ret[year] += 350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
 
-	if sp:
-		if (year > 2023 and year < 2028):
-			ret[year] = ret[2024]+350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350/yr for 4 years => $1.4M
-		elif year >= 2027:
-			ret[year] = (ret[2024]+1400000)*math.pow(1.03,(year-2027))
-	else:
-		if year > 2024:
-			ret[year] = ret[2024]*math.pow(1.02,1)*math.pow(1.03,(year-2025))  # assume 1 years @ 2%, 3% increase yearly after 2025
+# 	if sp:
+# 		if (year > 2023 and year < 2028):
+# 			ret[year] = ret[2024]+350000*(year-2023)  # readjust staff/adm salaries to reach 0.95*mid; $350k/yr for 4 years => $1.4M
+# 		elif year >= 2027:
+# 			ret[year] = (ret[2024]+1400000)*math.pow(1.03,(year-2027))
+# 	else:
+# 		if year > 2024:
+# 			ret[year] = ret[2024]*math.pow(1.02,1)*math.pow(1.03,(year-2025))  # assume 1 years @ 2%, 3% increase yearly after 2025
 		
 
 	return ret[year]
